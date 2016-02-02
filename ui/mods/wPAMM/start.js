@@ -10,9 +10,10 @@
 })()
 
 require([
-  'pamm/registry',
-  'pamm/collection',
-], function(registry, collection) {
+  'pamm/pamm'
+], function(pamm) {
   "use strict";
-  console.log('run')
+
+  pamm.client.scan()
+  pamm.server.scan()
 })
