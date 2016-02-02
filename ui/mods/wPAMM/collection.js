@@ -61,5 +61,14 @@ define([], function() {
     })
   }
 
+  Collection.prototype.activate = function(identifier) {
+    var my = this
+    my.active.mount_order.push(identifier)
+    var files = {}
+    files[my.path + 'mods.json'] = JSON.stringify(my.active)
+    api.file.mountMemoryFiles(files)
+    api.content.remount()
+  }
+
   return Collection
 })
