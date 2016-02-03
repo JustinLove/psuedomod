@@ -1,7 +1,7 @@
 define([
   'pamm/pamm_mod',
-  'pamm/lib/jszip'
-], function(pammMod, JSZip) {
+  'pamm/file'
+], function(pammMod, file) {
   var Collection = function(context, path) {
     this.context = context
     this.path = path
@@ -101,42 +101,13 @@ define([
   Collection.prototype.write = function() {
     var my = this
     var files = pammMod(my)
-    //api.file.mountMemoryFiles(pammMod(my))
+
+    // what we wanted
+    //api.file.mountMemoryFiles(files)
     //api.content.remount()
-    zipMountFiles(files, my.identifier+'.zip')
 
-    /*
-    var blob = zip.generate({type: 'blob'})
-    var url = window.URL.createObjectURL(blob)
-    api.download.start(url, my.zip)
-    api.file.zip.catalog('/download/foo', '/').then(first, first)
-    watchDownload(my.zip)
-    */
+    // what we have
+    file.mountZippedFiles(files, my.identifier+'.zip')
   }
-
-  var zipMountFiles = function(files, filename) {
-    var zip = new JSZip()
-    _.each(files, function(content, path) {
-      zip.file(path, content)
-    })
-    var blob = zip.generate({type: 'blob'})
-    var url = window.URL.createObjectURL(blob)
-    api.download.start(url, filename)
-    watchDownload(filename)
-  }
-
-  var watchDownload = function(zip) {
-    api.download.status(zip).then(function(status) {
-      console.log(status)
-      if (status.state == 'complete') {
-        api.file.zip.catalog('/download/'+zip).then(first, first)
-        api.file.zip.mount('/download/'+zip, '/')
-        api.content.remount()
-      } else if (status.state == 'activated' || status.state == 'downloading') {
-        setTimeout(watchDownload, 100, zip)
-      }
-    })
-  }
-
   return Collection
 })
