@@ -1,7 +1,5 @@
 define([], function() {
-  var Scan = function(context) {
-    this.context = context
-    this.identifier = 'com.wondible.pa.pamm.' + context
+  var Scan = function() {
     this.mods = []
     this.enabled = []
     this.pending = 0
@@ -12,11 +10,6 @@ define([], function() {
     var my = this
     my.pending++
     $.get('coui:/'+path).then(function(info) {
-      if (info.context != my.context) {
-        console.error(info.identifier, path, 'wrong mod context')
-        my.resolve()
-        return
-      }
       info.installpath = path
       my.mods.push(info)
       //console.log(info.identifier)
@@ -32,18 +25,6 @@ define([], function() {
     my.pending++
     $.get('coui:/'+path).then(function(mods) {
       my.enabled = mods.mount_order
-      my.enabled = my.enabled.filter(function(id) {
-        if (id == 'com.pa.deathbydenim.dpamm') {
-          return false
-        } else if (id == 'com.pa.raevn.rpamm') {
-          return false
-        } else {
-          return true
-        }
-      })
-      if (my.enabled.indexOf(my.identifier) == -1) {
-        my.enabled.push(my.identifier)
-      }
       my.resolve()
     }, function(err) {
       console.error(path, 'not found', err)
