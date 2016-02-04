@@ -19,6 +19,7 @@ define(['pamm/lib/jszip'], function(JSZip) {
         api.file.zip.catalog('/download/'+filename).then(first, first)
         api.file.zip.mount('/download/'+filename, '/')
         api.content.remount()
+        console.log('mounted')
       } else if (status.state == 'activated' || status.state == 'downloading') {
         setTimeout(watchDownload, 100, url, filename)
       } else {

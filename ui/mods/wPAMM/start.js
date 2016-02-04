@@ -7,6 +7,13 @@
   var stub = function() {}
   _.defaults(handlers, {
   })
+
+  api.pamm = {}
+  api.pamm.unmountAllMemoryFiles = api.file.unmountAllMemoryFiles
+  api.file.unmountAllMemoryFiles = function() {
+    console.log('hooked')
+    api.pamm.unmountAllMemoryFiles()
+  }
 })()
 
 require([
@@ -15,6 +22,11 @@ require([
 ], function(pamm) {
   "use strict";
 
-  pamm.client.scan()
-  pamm.server.scan()
+  console.log('start')
+
+  _.assign(pamm, api.pamm)
+  api.pamm = pamm
+
+  api.pamm.client.scan()
+  api.pamm.server.scan()
 })
