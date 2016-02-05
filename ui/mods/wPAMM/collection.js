@@ -79,7 +79,7 @@ define([
     //api.content.remount()
 
     // what we have
-    file.mountZippedFiles(files, my.identifier+'.zip')
+    file.mountZippedFiles(files, my.identifier+'.zip', '/')
   }
   return Collection
 })
