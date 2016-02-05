@@ -1,32 +1,39 @@
 (function() {
+  "use strict";
+
   var config = require.s.contexts._.config
   config.waitSeconds = 0
   config.paths.pamm = 'coui://client_mods/wPAMM/ui/mods/wPAMM'
 
-  // make the object keys exist for Panel.ready
-  var stub = function() {}
-  _.defaults(handlers, {
-  })
-
   api.pamm = {}
+  api.pamm.sessionKey = 'com.wondible.pa.pamm.mounts'
+  api.pamm.mounts = sessionStorage.getItem(api.pamm.sessionKey) || {},
+  api.pamm.mount = function(reason) {
+    var promises = []
+    _.each(api.pamm.mounts, function(root, zip) {
+      promises.push(api.file.zip.mount(zip, root))
+    })
+    $.when.apply($, promises).then(function() {
+      api.content.remount()
+      console.log('pamm mounted: ' + reason)
+    })
+  }
+  api.pamm.mount('page load')
+
   api.pamm.unmountAllMemoryFiles = api.file.unmountAllMemoryFiles
   api.file.unmountAllMemoryFiles = function() {
-    console.log('hooked')
     api.pamm.unmountAllMemoryFiles()
+    api.pamm.mount('unmounted')
   }
 })()
 
 require([
-  'pamm/pamm',
-  'pamm/pamm_mod'
+  'pamm/pamm'
 ], function(pamm) {
   "use strict";
-
-  console.log('start')
 
   _.assign(pamm, api.pamm)
   api.pamm = pamm
 
-  api.pamm.client.load()
-  api.pamm.server.load()
+  api.pamm.load()
 })

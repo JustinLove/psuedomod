@@ -3,6 +3,8 @@ define([
   'pamm/pamm_mod',
   'pamm/file'
 ], function(Scan, pammMod, file) {
+  "use strict";
+
   var Collection = function(context, path) {
     this.context = context
     this.path = path
@@ -79,7 +81,6 @@ define([
     file.zip.create(files, my.identifier+'.zip').then(function(status) {
       my.mounts['/download/' + status.file] = '/'
       my.persist()
-      my.mount()
     }, function(err) {
       console.log('zip failed', err)
     })
@@ -93,7 +94,7 @@ define([
     })
     $.when.apply($, promises).then(function() {
       api.content.remount()
-      console.log('mounted')
+      console.log('collection mounted')
     })
   }
 
@@ -121,22 +122,25 @@ define([
 
   Collection.prototype.load = function() {
     var my = this
-    return api.memory.load(my.identifier).then(function(string) {
+    var promise = $.Deferred()
+    api.memory.load(my.identifier).then(function(string) {
       if (string) {
         my.deserialize(decode(string))
-        my.mount()
+        promise.resolve(my)
       } else {
         my.scan().then(function() {
           my.write()
+          promise.resolve(my)
         }, function() {
           my.persist()
+          promise.resolve(my)
         })
       }
-      return my
     }, function(err) {
       console.log('memory fail?', err)
-      return err
+      promise.reject(err)
     })
+    return promise
   }
 
   return Collection

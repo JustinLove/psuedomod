@@ -1,10 +1,12 @@
 define(['pamm/lib/jszip'], function(JSZip) {
+  "use strict";
+
   var mountZippedFiles = function(files, filename, root) {
     createZip(files, filename).then(function(status) {
       //api.file.zip.catalog('/download/'+filename).then(first, first)
       api.file.zip.mount('/download/'+filename, root).then(function() {
         api.content.remount()
-        console.log('mounted')
+        console.log('mounted zipped files')
       }, function() {
         console.error('zip mount failed', filename, root)
       })

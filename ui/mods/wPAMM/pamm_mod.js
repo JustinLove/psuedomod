@@ -1,4 +1,6 @@
 define([], function() {
+  "use strict";
+
   var mod = function(collection) {
     var files = {}
     var path = collection.path + collection.identifier

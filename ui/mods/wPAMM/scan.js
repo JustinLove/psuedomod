@@ -1,4 +1,6 @@
 define([], function() {
+  "use strict";
+
   var Scan = function() {
     this.mods = []
     this.enabled = []
