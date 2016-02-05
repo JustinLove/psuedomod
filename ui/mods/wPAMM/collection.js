@@ -78,6 +78,7 @@ define([
     var files = pammMod(my)
     file.zip.create(files, my.identifier+'.zip').then(function(status) {
       my.mounts['/download/' + status.file] = '/'
+      my.persist()
       my.mount()
     }, function(err) {
       console.log('zip failed', err)
@@ -93,6 +94,46 @@ define([
     $.when.apply($, promises).then(function() {
       api.content.remount()
       console.log('mounted')
+    })
+  }
+
+  Collection.prototype.serialize = function() {
+    var my = this
+    return {
+      mods: my.mods,
+      enabled: my.enabled,
+      mounts: my.mounts,
+    }
+  }
+
+  Collection.prototype.deserialize = function(state) {
+    //console.log('deser', state)
+    var my = this
+    my.mods = state.mods
+    my.enabled = state.enabled
+    my.mounts = state.mounts
+  }
+
+  Collection.prototype.persist = function() {
+    var my = this
+    api.memory.store(my.identifier, encode(my.serialize()))
+  }
+
+  Collection.prototype.load = function() {
+    var my = this
+    return api.memory.load(my.identifier).then(function(string) {
+      if (string) {
+        my.deserialize(decode(string))
+        my.mount()
+      } else {
+        my.scan().then(function() {
+          my.write()
+        })
+      }
+      return my
+    }, function(err) {
+      console.log('memory fail?', err)
+      return err
     })
   }
 

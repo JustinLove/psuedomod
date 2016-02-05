@@ -27,6 +27,6 @@ require([
   _.assign(pamm, api.pamm)
   api.pamm = pamm
 
-  api.pamm.client.scan()
-  api.pamm.server.scan()
+  api.pamm.client.load()
+  api.pamm.server.load()
 })
