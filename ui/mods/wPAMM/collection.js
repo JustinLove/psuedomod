@@ -9,6 +9,7 @@ define([
     this.identifier = 'com.wondible.pa.pamm.' + context
     this.mods = []
     this.enabled = []
+    this.mounts = {}
   }
 
   var inContext = function(context, mods) {
@@ -46,6 +47,8 @@ define([
       my.enabled = editEnabled(my.identifier, scan.enabled)
       console.log(my.context, 'found', my.mods.length, 'enabled', my.enabled.length)
       return scan
+    }, function(err) {
+      console.log('scan failed', err)
     })
   }
 
@@ -73,13 +76,25 @@ define([
   Collection.prototype.write = function() {
     var my = this
     var files = pammMod(my)
-
-    // what we wanted
-    //api.file.mountMemoryFiles(files)
-    //api.content.remount()
-
-    // what we have
-    file.mountZippedFiles(files, my.identifier+'.zip', '/')
+    file.zip.create(files, my.identifier+'.zip').then(function(status) {
+      my.mounts['/download/' + status.file] = '/'
+      my.mount()
+    }, function(err) {
+      console.log('zip failed', err)
+    })
   }
+
+  Collection.prototype.mount = function() {
+    var my = this
+    var promises = []
+    _.each(my.mounts, function(root, zip) {
+      promises.push(api.file.zip.mount(zip, root))
+    })
+    $.when.apply($, promises).then(function() {
+      api.content.remount()
+      console.log('mounted')
+    })
+  }
+
   return Collection
 })
