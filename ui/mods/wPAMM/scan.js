@@ -41,6 +41,10 @@ define([], function() {
       }
       my.pending++
       api.file.list(path).then(function(top) {
+        if (top.length < 1) {
+          my.resolve()
+          return
+        }
         for (var i in top) {
           if (top[i].match(/modinfo.json$/)) {
             my.addModinfo(top[i])
