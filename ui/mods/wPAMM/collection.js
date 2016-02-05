@@ -128,6 +128,8 @@ define([
       } else {
         my.scan().then(function() {
           my.write()
+        }, function() {
+          my.persist()
         })
       }
       return my
