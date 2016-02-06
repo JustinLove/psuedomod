@@ -51,10 +51,37 @@ define(['pamm/lib/jszip'], function(JSZip) {
     })
   }
 
+  var loadBinary = function(url, type) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url);
+    xhr.responseType = type || 'arraybuffer'
+    var promise = $.Deferred()
+
+    xhr.onload = function () {
+      if (this.status === 200) {
+        promise.resolve(xhr.response)
+      } else {
+        promise.reject(xhr)
+      }
+    };
+    xhr.onerror = function() {
+      promise.reject(xhr)
+    }
+    xhr.send();
+    return promise
+  }
+
+  var readZip = function(url) {
+    return loadBinary(url).then(function(stuff) {
+      return new JSZip(stuff)
+    })
+  }
+
   return {
     mountZippedFiles: mountZippedFiles,
     zip: {
       create: createZip,
+      read: readZip,
     },
   }
 })
