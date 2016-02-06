@@ -1,8 +1,8 @@
 define([
-  'pamm/scan',
+  'pamm/filesystem_scan',
   'pamm/pamm_mod',
   'pamm/file'
-], function(Scan, pammMod, file) {
+], function(FilesytemScan, pammMod, file) {
   "use strict";
 
   var Collection = function(context, path) {
@@ -17,7 +17,7 @@ define([
   var inContext = function(context, mods) {
     return mods.filter(function(info) {
       if (info.context != context) {
-        console.error(info.identifier, info.installPath, 'wrong mod context')
+        console.error(info.identifier, info.installpath, 'wrong mod context')
         return false
       } else {
         return true
@@ -44,7 +44,7 @@ define([
 
   Collection.prototype.scan = function() {
     var my = this
-    return new Scan().scan(my.path).then(function(scan) {
+    return new FilesystemScan().scan(my.path).then(function(scan) {
       my.mods = inContext(my.context, scan.mods)
       my.enabled = editEnabled(my.identifier, scan.enabled)
       console.log(my.context, 'found', my.mods.length, 'enabled', my.enabled.length)

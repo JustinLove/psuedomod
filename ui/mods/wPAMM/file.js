@@ -73,7 +73,11 @@ define(['pamm/lib/jszip'], function(JSZip) {
 
   var readZip = function(url) {
     return loadBinary(url).then(function(stuff) {
-      return new JSZip(stuff)
+      try {
+        return new JSZip(stuff)
+      } catch(e) {
+        return new JSZip()
+      }
     })
   }
 

@@ -1,6 +1,7 @@
 define([
   'pamm/registry',
   'pamm/collection',
+  'pamm/download_scan',
 ], function(registry, Collection) {
   "use strict";
 
