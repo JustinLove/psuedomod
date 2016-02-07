@@ -5,7 +5,7 @@ define([], function() {
     this.mods = []
     this.enabled = []
     this.pending = 0
-    this.promise = $.Deferred()
+    this.promise = engine.createDeferred()
   }
 
   Scan.prototype.addModinfo = function(path) {

@@ -16,9 +16,15 @@ define([
   }
 
   pamm.load = function() {
-    $.when(client.load(), server.load()).then(function(c, s) {
-      pamm.write()
-    })
+    var count = 2
+    var done = function() {
+      count--
+      if (count < 1) {
+        pamm.write()
+      }
+    }
+    client.load().always(done)
+    server.load().always(done)
   }
 
   pamm.write = function() {

@@ -10,12 +10,15 @@
   api.pamm.mounts = decode(sessionStorage.getItem(api.pamm.sessionKey) || "{}")
   api.pamm.mount = function(reason) {
     var promises = []
+    var count = Object.keys(api.pamm.mounts).length
     _.each(api.pamm.mounts, function(root, zip) {
-      promises.push(api.file.zip.mount(zip, root))
-    })
-    $.when.apply($, promises).then(function() {
-      api.content.remount()
-      console.log('pamm mounted: ' + reason)
+      api.file.zip.mount(zip, root).always(function() {
+        count--
+        if (count < 1) {
+          api.content.remount()
+          console.log('pamm mounted: ' + reason)
+        }
+      })
     })
   }
   api.pamm.mount('page load')

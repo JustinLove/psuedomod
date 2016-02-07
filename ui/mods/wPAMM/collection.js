@@ -57,7 +57,7 @@ define([
   Collection.prototype.enable = function(identifier) {
     var my = this
     my.enabled.push(identifier)
-    my.write()
+    return my.write()
   }
 
   Collection.prototype.enabledMods = function() {
@@ -78,23 +78,13 @@ define([
   Collection.prototype.write = function() {
     var my = this
     var files = pammMod(my)
-    file.zip.create(files, my.identifier+'.zip').then(function(status) {
+    return file.zip.create(files, my.identifier+'.zip').then(function(status) {
       my.mounts['/download/' + status.file] = '/'
       my.persist()
+      return my
     }, function(err) {
       console.log('zip failed', err)
-    })
-  }
-
-  Collection.prototype.mount = function() {
-    var my = this
-    var promises = []
-    _.each(my.mounts, function(root, zip) {
-      promises.push(api.file.zip.mount(zip, root))
-    })
-    $.when.apply($, promises).then(function() {
-      api.content.remount()
-      console.log('collection mounted')
+      return err
     })
   }
 
@@ -122,25 +112,22 @@ define([
 
   Collection.prototype.load = function() {
     var my = this
-    var promise = $.Deferred()
-    api.memory.load(my.identifier).then(function(string) {
+    return api.memory.load(my.identifier).then(function(string) {
       if (string) {
         my.deserialize(decode(string))
-        promise.resolve(my)
+        return my
       } else {
-        my.scan().then(function() {
-          my.write()
-          promise.resolve(my)
+        return my.scan().then(function() {
+          return my.write()
         }, function() {
           my.persist()
-          promise.resolve(my)
+          return my
         })
       }
     }, function(err) {
       console.log('memory fail?', err)
-      promise.reject(err)
+      return err
     })
-    return promise
   }
 
   return Collection

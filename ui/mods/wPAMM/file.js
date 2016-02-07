@@ -24,7 +24,7 @@ define(['pamm/lib/jszip'], function(JSZip) {
   }
 
   var download = function(url, filename) {
-    var promise = $.Deferred()
+    var promise = engine.createDeferred()
     api.download.start(url, filename)
     watchDownload(url, filename, promise)
     return promise
@@ -55,7 +55,7 @@ define(['pamm/lib/jszip'], function(JSZip) {
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url);
     xhr.responseType = type || 'arraybuffer'
-    var promise = $.Deferred()
+    var promise = engine.createDeferred()
 
     xhr.onload = function () {
       if (this.status === 200) {
