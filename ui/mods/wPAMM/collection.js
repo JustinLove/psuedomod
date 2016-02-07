@@ -2,7 +2,7 @@ define([
   'pamm/filesystem_scan',
   'pamm/pamm_mod',
   'pamm/file'
-], function(FilesytemScan, pammMod, file) {
+], function(FilesystemScan, pammMod, file) {
   "use strict";
 
   var Collection = function(context, path) {

@@ -7,7 +7,7 @@
 
   api.pamm = {}
   api.pamm.sessionKey = 'com.wondible.pa.pamm.mounts'
-  api.pamm.mounts = sessionStorage.getItem(api.pamm.sessionKey) || {},
+  api.pamm.mounts = decode(sessionStorage.getItem(api.pamm.sessionKey) || "{}")
   api.pamm.mount = function(reason) {
     var promises = []
     _.each(api.pamm.mounts, function(root, zip) {
