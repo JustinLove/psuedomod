@@ -1,9 +1,8 @@
 define([
   'pamm/registry',
   'pamm/collection',
-  'pamm/filesystem_scan',
-  'pamm/download_scan',
-], function(registry, Collection, FilesystemScan, DownloadScan) {
+  'pamm/local_state',
+], function(registry, Collection, local_state) {
   "use strict";
 
   // functionality required synchronously is in start.js
@@ -16,63 +15,32 @@ define([
     server: server,
   }
 
-  var join = function(promises) {
-    var complete = engine.createDeferred()
-    var count = promises.length
-    var done = function(v) {
-      count--
-      if (count < 1) {
-        complete.resolve(true)
-      }
-    }
-    promises.forEach(function(p) {p.always(done)})
-    return complete
-  }
-
   pamm.load = function() {
-    return join([
-      client.load(),
-      server.load(),
-    ]).then(pamm.scan)
+    return local_state.load().then(function(state) {
+      pamm.client.deserialize(state.client)
+      pamm.server.deserialize(state.server)
+      return pamm.write()
+    })
   }
 
-  pamm.scan = function() {
-    return join([
-      new FilesystemScan().scan(client.path).then(function(scan) {
-        console.log(client.path, 'found', scan.mods.length, 'enabled', scan.enabled.length)
-        client.injest(scan.mods)
-        client.enable(scan.enabled)
-      }),
-      new FilesystemScan().scan(server.path).then(function(scan) {
-        console.log(server.path, 'found', scan.mods.length, 'enabled', scan.enabled.length)
-        server.injest(scan.mods)
-        server.enable(scan.enabled)
-      }),
-      new DownloadScan().scan().then(function(scan) {
-        console.log('download found', scan.mods.length)
-        var cm = []
-        var sm = []
-        scan.mods.forEach(function(info) {
-          if (info.identifier == client.identifier) {
-            // pass
-          } else if (info.identifier == server.identifier) {
-            // pass
-          } else if (info.context == 'client') {
-            cm.push(info)
-          } else if (info.context == 'server') {
-            sm.push(info)
-          } else {
-            console.error(info.identifier, info.installpath || info.zippath, 'unknown mod context')
-          }
-        })
-        client.injest(cm)
-        server.injest(sm)
-      }),
-    ]).then(pamm.write)
+  pamm.refresh = function() {
+    return local_state.refresh().then(function(state) {
+      pamm.client.deserialize(state.client)
+      pamm.server.deserialize(state.server)
+      return pamm.write()
+    })
+  }
+
+  pamm.save = function() {
+    return local_state.save({
+      client: pamm.client.serialize(),
+      server: pamm.server.serialize(),
+    })
   }
 
   pamm.write = function() {
-    return join([
+    return local_state.join([
+      pamm.save(),
       client.write(),
       server.write(),
     ]).then(function() {

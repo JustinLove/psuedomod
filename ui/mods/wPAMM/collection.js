@@ -9,13 +9,17 @@ define([
     this.path = path
     this.identifier = 'com.wondible.pa.pamm.' + context
     this.mods = []
-    this.enabled = [this.identifier]
+    this.enabled = []
     this.mounts = {}
   }
 
-  var inContext = function(context, mods) {
+  Collection.prototype.allowed = function(mods) {
+    var my = this
     return mods.filter(function(info) {
-      if (info.context != context) {
+      if (info.identifier == my.identifier) {
+        console.log(info.identifier, info.installpath || info.zippath, 'should not manage myself')
+        return false
+      } else if (info.context != my.context) {
         console.error(info.identifier, info.installpath || info.zippath, 'wrong mod context')
         return false
       } else {
@@ -26,11 +30,13 @@ define([
 
   Collection.prototype.injest = function(mods) {
     var my = this
-    my.mods = my.mods.concat(inContext(my.context, mods))
+    my.mods = my.mods.concat(my.allowed(mods))
     return engine.createDeferred().resolve(my)
   }
 
   var exclude = [
+    'com.wondible.pa.pamm.client',
+    'com.wondible.pa.pamm.server',
     'com.pa.deathbydenim.dpamm',
     'com.pa.raevn.rpamm',
     'com.pa.pamm.server',
@@ -45,6 +51,15 @@ define([
       }
     })
     return engine.createDeferred().resolve(true)
+  }
+
+  Collection.prototype.enabledIdentifiers = function() {
+    var my = this
+    if (my.context = 'client') {
+      return my.enabled.concat([my.identifier])
+    } else {
+      return [my.identifier].concat(my.enabled)
+    }
   }
 
   Collection.prototype.enabledMods = function() {
@@ -64,11 +79,10 @@ define([
 
   Collection.prototype.write = function() {
     var my = this
-    console.log(my.context, 'found', my.mods.length, 'enabled', my.enabled.length)
+    console.log(my.context, 'mods', my.mods.length, 'enabled', my.enabled.length)
     var files = pammMod(my)
     return file.zip.create(files, my.identifier+'.zip').then(function(status) {
       my.mounts['/download/' + status.file] = '/'
-      my.persist()
       return my
     }, function(err) {
       console.log('zip failed', err)
@@ -88,28 +102,11 @@ define([
   Collection.prototype.deserialize = function(state) {
     //console.log('deser', state)
     var my = this
-    my.mods = state.mods
-    my.enabled = state.enabled
-    my.mounts = state.mounts
-  }
-
-  Collection.prototype.persist = function() {
-    var my = this
-    return api.memory.store(my.identifier, encode(my.serialize()))
-  }
-
-  Collection.prototype.load = function() {
-    var my = this
-    return api.memory.load(my.identifier).then(function(string) {
-      string = null
-      if (string) {
-        my.deserialize(decode(string))
-      }
-      return my
-    }, function(err) {
-      console.log('memory fail?', err)
-      return err
-    })
+    my.mods = []
+    my.injest(state.mods)
+    my.enabled = []
+    my.enable(state.enabled)
+    my.mounts = state.mounts || {}
   }
 
   return Collection

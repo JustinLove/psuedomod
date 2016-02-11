@@ -18,7 +18,7 @@ define([], function() {
   }
 
   var mods = function(collection) {
-    return JSON.stringify({mount_order: collection.enabled})
+    return JSON.stringify({mount_order: collection.enabledIdentifiers()})
   }
 
   var ui_mod_list = function(collection) {
