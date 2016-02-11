@@ -31,7 +31,9 @@ define([
   Collection.prototype.injest = function(mods) {
     var my = this
     my.mods = my.mods.concat(my.allowed(mods))
-    return engine.createDeferred().resolve(my)
+    var promise = engine.createDeferred()
+    promise.resolve(my)
+    return promise
   }
 
   var exclude = [
@@ -50,12 +52,14 @@ define([
         my.enabled.push(id)
       }
     })
-    return engine.createDeferred().resolve(true)
+    var promise = engine.createDeferred()
+    promise.resolve(true)
+    return promise
   }
 
   Collection.prototype.enabledIdentifiers = function() {
     var my = this
-    if (my.context = 'client') {
+    if (my.context == 'client') {
       return my.enabled.concat([my.identifier])
     } else {
       return [my.identifier].concat(my.enabled)
@@ -77,11 +81,26 @@ define([
     return enabled
   }
 
+  Collection.prototype.updateMounts = function() {
+    var my = this
+    my.mounts = {}
+    my.enabled.forEach(function(id) {
+      for (var i in my.mods) {
+        if (my.mods[i].identifier == id && my.mods[i].zippath) {
+          console.log('will mount ', my.mods[i].zippath)
+          my.mounts[my.mods[i].zippath] = my.path
+          return
+        }
+      }
+    })
+  }
+
   Collection.prototype.write = function() {
     var my = this
     console.log(my.context, 'mods', my.mods.length, 'enabled', my.enabled.length)
     var files = pammMod(my)
     return file.zip.create(files, my.identifier+'.zip').then(function(status) {
+      my.updateMounts()
       my.mounts['/download/' + status.file] = '/'
       return my
     }, function(err) {

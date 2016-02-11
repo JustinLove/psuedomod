@@ -12,6 +12,7 @@
     var promises = []
     var count = Object.keys(api.pamm.mounts).length
     _.each(api.pamm.mounts, function each_pamm_mounts(root, zip) {
+      console.log(zip, root)
       api.file.zip.mount(zip, root).always(function mount_countdown() {
         count--
         if (count < 1) {
