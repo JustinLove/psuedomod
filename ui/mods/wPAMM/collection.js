@@ -1,8 +1,7 @@
 define([
-  'pamm/filesystem_scan',
   'pamm/pamm_mod',
   'pamm/file'
-], function(FilesystemScan, pammMod, file) {
+], function(pammMod, file) {
   "use strict";
 
   var Collection = function(context, path) {
@@ -10,14 +9,14 @@ define([
     this.path = path
     this.identifier = 'com.wondible.pa.pamm.' + context
     this.mods = []
-    this.enabled = []
+    this.enabled = [this.identifier]
     this.mounts = {}
   }
 
   var inContext = function(context, mods) {
     return mods.filter(function(info) {
       if (info.context != context) {
-        console.error(info.identifier, info.installpath, 'wrong mod context')
+        console.error(info.identifier, info.installpath || info.zippath, 'wrong mod context')
         return false
       } else {
         return true
@@ -25,39 +24,27 @@ define([
     })
   }
 
-  var editEnabled = function(identifier, enabled) {
-    if (enabled.indexOf(identifier) == -1) {
-      enabled.push(identifier)
-    }
-    return enabled.filter(function(id) {
-      if (id == 'com.pa.deathbydenim.dpamm') {
-        return false
-      } else if (id == 'com.pa.raevn.rpamm') {
-        return false
-      } else if (id == 'com.pa.pamm.server') {
-        return false
-      } else {
-        return true
+  Collection.prototype.injest = function(mods) {
+    var my = this
+    my.mods = my.mods.concat(inContext(my.context, mods))
+    return engine.createDeferred().resolve(my)
+  }
+
+  var exclude = [
+    'com.pa.deathbydenim.dpamm',
+    'com.pa.raevn.rpamm',
+    'com.pa.pamm.server',
+  ]
+
+  Collection.prototype.enable = function(identifiers) {
+    var my = this
+    if (!Array.isArray(identifiers)) identifiers = [identifiers]
+    identifiers.forEach(function(id) {
+      if (exclude.indexOf(id) == -1 && my.enabled.indexOf(id) == -1) {
+        my.enabled.push(id)
       }
     })
-  }
-
-  Collection.prototype.scan = function() {
-    var my = this
-    return new FilesystemScan().scan(my.path).then(function(scan) {
-      my.mods = inContext(my.context, scan.mods)
-      my.enabled = editEnabled(my.identifier, scan.enabled)
-      console.log(my.context, 'found', my.mods.length, 'enabled', my.enabled.length)
-      return scan
-    }, function(err) {
-      console.log('scan failed', err)
-    })
-  }
-
-  Collection.prototype.enable = function(identifier) {
-    var my = this
-    my.enabled.push(identifier)
-    return my.write()
+    return engine.createDeferred().resolve(true)
   }
 
   Collection.prototype.enabledMods = function() {
@@ -77,6 +64,7 @@ define([
 
   Collection.prototype.write = function() {
     var my = this
+    console.log(my.context, 'found', my.mods.length, 'enabled', my.enabled.length)
     var files = pammMod(my)
     return file.zip.create(files, my.identifier+'.zip').then(function(status) {
       my.mounts['/download/' + status.file] = '/'
@@ -107,23 +95,17 @@ define([
 
   Collection.prototype.persist = function() {
     var my = this
-    api.memory.store(my.identifier, encode(my.serialize()))
+    return api.memory.store(my.identifier, encode(my.serialize()))
   }
 
   Collection.prototype.load = function() {
     var my = this
     return api.memory.load(my.identifier).then(function(string) {
+      string = null
       if (string) {
         my.deserialize(decode(string))
-        return my
-      } else {
-        return my.scan().then(function() {
-          return my.write()
-        }, function() {
-          my.persist()
-          return my
-        })
       }
+      return my
     }, function(err) {
       console.log('memory fail?', err)
       return err
