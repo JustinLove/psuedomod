@@ -10,6 +10,9 @@
   "identifier": "com.wondible.pa.pamm",
   "priority": 0,
   "scenes": {
+    "global_mod_list": [
+      "coui://ui/mods/wPAMM/permazip.js"
+    ],
     "start": [
       "coui://ui/mods/wPAMM/start.js"
     ]

@@ -44,11 +44,14 @@ define([
       client.write(),
       server.write(),
     ]).then(function() {
-      pamm.mounts = _.extend({}, client.mounts, server.mounts)
-      sessionStorage.setItem(pamm.sessionKey, encode(pamm.mounts))
-      pamm.mount('collections updated')
+      pamm.mounts(_.extend({}, client.mounts, server.mounts))
       return true
     })
+  }
+
+  pamm.engineEnabled = function() {
+    pamm.client.engineEnabled()
+    pamm.server.engineEnabled()
   }
 
   return pamm

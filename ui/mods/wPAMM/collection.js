@@ -59,7 +59,9 @@ define([
 
   Collection.prototype.enabledIdentifiers = function() {
     var my = this
-    if (my.context == 'client') {
+    if (my.enabled.length < 1) {
+      return []
+    } else if (my.context == 'client') {
       return my.enabled.concat([my.identifier])
     } else {
       return [my.identifier].concat(my.enabled)
@@ -126,6 +128,24 @@ define([
     my.enabled = []
     my.enable(state.enabled)
     my.mounts = state.mounts || {}
+  }
+
+  Collection.prototype.engineEnabled = function() {
+    var my = this
+    api.mods.getMountedMods(my.context, function(mods) {
+      console.log(['--', my.context, '--'])
+      mods.forEach(function(mod) {
+        console.log(mod.identifier)
+      })
+    })
+  }
+
+  Collection.prototype.installed = function() {
+    var my = this
+    console.log(['--', my.context, '--'])
+    my.mods.forEach(function(mod) {
+      console.log(mod.identifier)
+    })
   }
 
   return Collection
