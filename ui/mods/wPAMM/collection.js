@@ -103,7 +103,7 @@ define([
     var files = pammMod(my)
     return file.zip.create(files, my.identifier+'.zip').then(function(status) {
       my.updateMounts()
-      my.mounts['/download/' + status.file] = '/'
+      my.mounts['/download/' + status.file] = my.path
       return my
     }, function(err) {
       console.log('zip failed', err)

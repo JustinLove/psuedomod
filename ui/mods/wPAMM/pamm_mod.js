@@ -3,7 +3,7 @@ define([], function() {
 
   var mod = function(collection) {
     var files = {}
-    var path = collection.path + collection.identifier
+    var path = collection.identifier
     files[path + '/modinfo.json'] = modinfo(collection)
     var ui = ui_mod_list(collection)
     files[path + '/ui/mods/ui_mod_list.js'] = ui
@@ -13,7 +13,7 @@ define([], function() {
     if (collection.context != 'server') {
       files[path + '/ui/mods/ui_mod_list_for_server.js'] = ui
     }
-    files[collection.path + 'mods.json'] = mods(collection)
+    files['mods.json'] = mods(collection)
     return files
   }
 
@@ -37,14 +37,25 @@ define([], function() {
       })
     })
 
-    return "var global_mod_list = " + JSON.stringify(global_mod_list, null, 4) + ";\n\nvar scene_mod_list = " + JSON.stringify(scene_mod_list, null, 4) + ";";
+    if (collection.context == 'server') {
+      return server_ui_mod_list(global_mod_list, scene_mod_list)
+    } else {
+      return client_ui_mod_list(global_mod_list, scene_mod_list)
+    }
+  }
+
+  var client_ui_mod_list = function(global_mod_list, scene_mod_list) {
+      return "var global_mod_list = " + JSON.stringify(global_mod_list, null, 4) + ";\n\nvar scene_mod_list = " + JSON.stringify(scene_mod_list, null, 4) + ";";
+  }
+
+  var server_ui_mod_list = function(global_mod_list, scene_mod_list) {
+      return "var global_server_mod_list = " + JSON.stringify(global_mod_list, null, 4) + ";\n\nvar scene_server_mod_list = " + JSON.stringify(scene_mod_list, null, 4) + ";\n\ntry { \n\nloadScript('coui://ui/mods/ui_mod_list_for_server.js');\n\ntry { global_mod_list = _.union( global_mod_list, global_server_mod_list ) } catch (e) { console.log(e); } ;\n\ntry { _.forOwn( scene_server_mod_list, function( value, key ) { if ( scene_mod_list[ key ] ) { scene_mod_list[ key ] = _.union( scene_mod_list[ key ], value ) } else { scene_mod_list[ key ] = value } } ); } catch (e) { console.log(e); } \n\n\} catch (e) {\n\nconsole.log(e);\n\nvar global_mod_list = global_server_mod_list;\n\nvar scene_mod_list = scene_server_mod_list;\n\n}\n\n";
   }
 
   var modinfo = function(collection) {
     var info = {
       "author": "wondible",
       "context": collection.context,
-      "date": "2016/01/31",
       "description": collection.identifier,
       "display_name": collection.identifier,
       "identifier": collection.identifier,

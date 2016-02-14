@@ -18,7 +18,10 @@
       })
     })
   }
-  pz.mount('page load')
+
+  if (window.location.href == 'coui://ui/main/main.html') {
+    pz.mount('application start')
+  }
 
   pz.mounts.subscribe(function() {
     pz.unmountAllMemoryFiles()
