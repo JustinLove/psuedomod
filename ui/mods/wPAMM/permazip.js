@@ -1,32 +1,33 @@
 (function() {
   "use strict";
 
-  api.pamm = {}
-  api.pamm.mounts = ko.observable({}).extend({local: 'com.wondible.pa.pamm.mounts'})
-  api.pamm.mount = function pamm_mount(reason) {
+  var pz = api.file.permazip = {}
+  pz.mounts = ko.observable({}).extend({local: 'com.wondible.pa.pamm.mounts'})
+  pz.mount = function permazip_mount(reason) {
     var promises = []
-    var count = Object.keys(api.pamm.mounts()).length
-    _.each(api.pamm.mounts(), function each_pamm_mounts(root, zip) {
+    var total = Object.keys(pz.mounts()).length
+    var count = total
+    _.each(pz.mounts(), function each_permazip_mounts(root, zip) {
       console.log(zip, root)
       api.file.zip.mount(zip, root).always(function mount_countdown() {
         count--
         if (count < 1) {
           api.content.remount()
-          console.log('pamm mounted: ' + reason)
+          console.log('permazip mounted ' + total.toString() + ': ' + reason)
         }
       })
     })
   }
-  api.pamm.mount('page load')
+  pz.mount('page load')
 
-  api.pamm.mounts.subscribe(function() {
-    api.pamm.unmountAllMemoryFiles()
-    api.pamm.mount('mounts updated')
+  pz.mounts.subscribe(function() {
+    pz.unmountAllMemoryFiles()
+    pz.mount('mounts updated')
   })
 
-  api.pamm.unmountAllMemoryFiles = api.file.unmountAllMemoryFiles
-  api.file.unmountAllMemoryFiles = function pamm_unmountAllMemoryFiles() {
-    api.pamm.unmountAllMemoryFiles()
-    api.pamm.mount('unmounted')
+  pz.unmountAllMemoryFiles = api.file.unmountAllMemoryFiles
+  api.file.unmountAllMemoryFiles = function permazip_unmountAllMemoryFiles() {
+    pz.unmountAllMemoryFiles()
+    pz.mount('unmounted')
   }
 })()

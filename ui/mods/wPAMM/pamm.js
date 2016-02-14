@@ -44,7 +44,7 @@ define([
       client.write(),
       server.write(),
     ]).then(function() {
-      pamm.mounts(_.extend({}, client.mounts, server.mounts))
+      api.file.permazip.mounts(_.extend({}, client.mounts, server.mounts))
       return true
     })
   }
