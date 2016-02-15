@@ -57,6 +57,15 @@ define([
     return promise
   }
 
+  Collection.prototype.disable = function(identifiers) {
+    var my = this
+    if (!Array.isArray(identifiers)) identifiers = [identifiers]
+    my.enabled = _.difference(my.enabled, identifiers)
+    var promise = engine.createDeferred()
+    promise.resolve(true)
+    return promise
+  }
+
   Collection.prototype.enabledIdentifiers = function() {
     var my = this
     if (my.enabled.length < 1) {
