@@ -23,7 +23,8 @@
     pz.mount('application start')
   }
 
-  pz.mounts.subscribe(function() {
+  // for possible: api.file.permazip.mounts_subscription.dispose()
+  pz.mounts_subscription = pz.mounts.subscribe(function() {
     pz.unmountAllMemoryFiles()
     pz.mount('mounts updated')
   })
