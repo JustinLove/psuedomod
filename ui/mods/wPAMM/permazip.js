@@ -4,6 +4,8 @@
   var pz = api.file.permazip = {}
   pz.mounts = ko.observable({}).extend({local: 'com.wondible.pa.pamm.mounts'})
   pz.mount = function permazip_mount(reason) {
+    var loadMods = api.settings.isSet('ui', 'pamm_load_mods', true) || 'LOAD'
+    if (loadMods == 'OFF') return
     var promises = []
     var total = Object.keys(pz.mounts()).length
     var count = total

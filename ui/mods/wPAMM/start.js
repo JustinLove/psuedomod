@@ -16,7 +16,6 @@ require([
   _.assign(pamm, api.pamm)
   api.pamm = pamm
 
-  console.log(model.uiOptions())
   if (!model.uiOptions().nomods) {
     api.pamm.load()
   }
