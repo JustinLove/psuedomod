@@ -41,6 +41,7 @@ define([], function() {
         my.loadEnabledMods(path)
         return
       }
+      if (path[path.length-1] != '/') return
       my.pending++
       api.file.list(path).then(function(top) {
         if (top.length < 1) {
