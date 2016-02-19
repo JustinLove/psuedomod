@@ -8,6 +8,14 @@ define([], function() {
     this.merge(mods || [])
   }
 
+  ModSet.prototype.clear = function() {
+    for (var i = 0;i < this.length;i++) {
+      delete this[i]
+    }
+    this.length = 0
+    return this
+  }
+
   ModSet.prototype.merge = function(mods) {
     var len = mods.length
     var from = 0
@@ -16,6 +24,7 @@ define([], function() {
       this[to] = mods[from]
     }
     this.length = this.length + len
+    return this
   }
 
   ModSet.prototype.forEach = Array.prototype.forEach
@@ -58,7 +67,7 @@ define([], function() {
   }
 
   ModSet.prototype.deserialize = function(state) {
-    return this.merge(state)
+    return this.clear().merge(state)
   }
 
   // ---------------- accessors -------------

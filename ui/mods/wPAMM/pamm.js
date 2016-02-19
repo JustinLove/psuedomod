@@ -8,34 +8,30 @@ define([
 
   // functionality required synchronously is in start.js
 
-  var set = new ModSet()
-
-  var pamm = {
-    set: set,
-  }
+  var pamm = new ModSet()
 
   pamm.load = function() {
     return local_state.load().then(function(state) {
-      pamm.set.deserialize(state.mods)
+      pamm.deserialize(state.mods)
       return pamm.write()
     })
   }
 
   pamm.refresh = function() {
     return local_state.refresh().then(function(state) {
-      pamm.set.deserialize(state.mods)
+      pamm.deserialize(state.mods)
       return pamm.write()
     })
   }
 
   pamm.save = function() {
     return local_state.save({
-      mods: pamm.set.serialize(),
+      mods: pamm.serialize(),
     })
   }
 
   pamm.write = function() {
-    var enabled = set.enabled()
+    var enabled = pamm.enabled()
     var client = new Context(enabled.client(), 'client', '/client_mods/')
     var server = new Context(enabled.server(), 'server', '/server_mods/')
     return local_state.join([

@@ -27,17 +27,12 @@ define([
     return this.mods
   }
 
-  Context.prototype.updateMounts = function() {
-    this.mounts = this.mods.getMounts(this.path)
-    return this.mounts
-  }
-
   Context.prototype.write = function() {
     var my = this
     console.log(my.context, 'mods', 'enabled', my.mods.length)
     var files = pammMod(my)
     return file.zip.create(files, my.identifier+'.zip').then(function(status) {
-      my.updateMounts()
+      my.mounts = my.mods.getMounts(my.path)
       my.mounts['/download/' + status.file] = my.path
       return my
     }, function(err) {
