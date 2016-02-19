@@ -1,8 +1,7 @@
 define([
-  'pamm/collection',
   'pamm/filesystem_scan',
   'pamm/download_scan',
-], function(Collection, FilesystemScan, DownloadScan) {
+], function(FilesystemScan, DownloadScan) {
   "use strict";
 
   var exclude = [
@@ -51,22 +50,12 @@ define([
 
     var state = {
       restored: false,
-      client: {
-        mods: [],
-        enabled: [],
-      },
-      server: {
-        mods: [],
-        enabled: [],
-      },
       mods: [],
       enabled: [],
     }
     return join([
       new FilesystemScan().scan('/client_mods/').then(function(scan) {
         console.log('client found', scan.mods.length, 'enabled', scan.enabled.length)
-        state.client.mods = state.client.mods.concat(scan.mods)
-        state.client.enabled = state.client.enabled.concat(scan.enabled)
         state.enabled = state.enabled.concat(scan.enabled)
         scan.mods.forEach(function(info) {
           if (info.context == 'client') {
@@ -78,8 +67,6 @@ define([
       }),
       new FilesystemScan().scan('/server_mods/').then(function(scan) {
         console.log('server found', scan.mods.length, 'enabled', scan.enabled.length)
-        state.server.mods = state.server.mods.concat(scan.mods)
-        state.server.enabled = state.server.enabled.concat(scan.enabled)
         state.enabled = state.enabled.concat(scan.enabled)
         scan.mods.forEach(function(info) {
           if (info.context == 'server') {
@@ -93,10 +80,8 @@ define([
         console.log('download found', scan.mods.length)
         scan.mods.forEach(function(info) {
           if (info.context == 'client') {
-            state.client.mods.push(info)
             state.mods.push(info)
           } else if (info.context == 'server') {
-            state.server.mods.push(info)
             state.mods.push(info)
           } else {
             console.error(info.identifier, info.installpath || info.zippath, 'unknown mod context', info.context)
@@ -111,6 +96,7 @@ define([
       state.mods.forEach(function(mod) {
         mod.enabled = state.enabled.indexOf(mod.identifier) != -1
       })
+      delete state.enabled
       return state
     })
   }
