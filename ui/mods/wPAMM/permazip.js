@@ -23,6 +23,9 @@
 
   pz.unmountAllMemoryFiles = api.file.unmountAllMemoryFiles
 
+  // automatic mount/unmount in atlas can cause infinite loop
+  if (window.location.protocol == 'atlas:') return
+
   api.game.getSetupInfo().then(function (payload) {
     if (parseUIOptions(payload.ui_options).nomods) {
       if (window.location.href == 'coui://ui/main/main.html') {
