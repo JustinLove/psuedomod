@@ -1,7 +1,4 @@
-define([
-  'pamm/pamm_mod',
-  'pamm/file'
-], function(pammMod, file) {
+define([], function() {
   "use strict";
 
   // ---------------- set methods -------------
@@ -45,6 +42,14 @@ define([
     return this.context('server')
   }
 
+  ModSet.prototype.filesystem = function() {
+    return this.filter(function(mod) {return mod.installpath})
+  }
+
+  ModSet.prototype.zip = function() {
+    return this.filter(function(mod) {return mod.zippath})
+  }
+
   ModSet.prototype.find = function(identifiers) {
     if (!Array.isArray(identifiers)) identifiers = [identifiers]
     return this.filter(function(mod) {
@@ -66,6 +71,15 @@ define([
 
   ModSet.prototype.getIdentifiers = function() {
     return this.map(function(mod) {return mod.identifier})
+  }
+
+  ModSet.prototype.getMounts = function(path) {
+    var mounts = {}
+    this.zip().forEach(function(mod) {
+      //console.log('will mount ', my.mods[i].zippath)
+      mounts[mod.zippath] = path
+    })
+    return mounts
   }
 
   // ---------------- actions -------------
@@ -98,48 +112,6 @@ define([
     })
     return this
   }
-
-  /*
-  ModSet.prototype.enabledIdentifiers = function() {
-    var my = this
-    if (my.enabled.length < 1) {
-      return []
-    } else if (my.context == 'client') {
-      return my.enabled.concat([my.identifier])
-    } else {
-      return [my.identifier].concat(my.enabled)
-    }
-  }
-
-  ModSet.prototype.updateMounts = function() {
-    var my = this
-    my.mounts = {}
-    my.enabled.forEach(function(id) {
-      for (var i in my.mods) {
-        if (my.mods[i].identifier == id && my.mods[i].zippath) {
-          console.log('will mount ', my.mods[i].zippath)
-          my.mounts[my.mods[i].zippath] = my.path
-          return
-        }
-      }
-    })
-  }
-
-  ModSet.prototype.write = function() {
-    var my = this
-    console.log(my.context, 'mods', my.mods.length, 'enabled', my.enabled.length)
-    var files = pammMod(my)
-    return file.zip.create(files, my.identifier+'.zip').then(function(status) {
-      my.updateMounts()
-      my.mounts['/download/' + status.file] = my.path
-      return my
-    }, function(err) {
-      console.log('zip failed', err)
-      return err
-    })
-  }
-
-  */
 
   return ModSet
 })

@@ -1,9 +1,10 @@
 define([
   'pamm/registry',
   'pamm/collection',
+  'pamm/context',
   'pamm/mod_set',
   'pamm/local_state',
-], function(registry, Collection, ModSet, local_state) {
+], function(registry, Collection, Context, ModSet, local_state) {
   "use strict";
 
   // functionality required synchronously is in start.js
@@ -45,6 +46,9 @@ define([
   }
 
   pamm.write = function() {
+    var enabled = set.enabled()
+    var client = new Context(enabled.client(), 'client', '/client_mods/')
+    var server = new Context(enabled.server(), 'server', '/server_mods/')
     return local_state.join([
       pamm.save(),
       client.write(),
