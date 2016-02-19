@@ -4,6 +4,8 @@
   var config = require.s.contexts._.config
   config.waitSeconds = 0
   config.paths.pamm = 'coui://client_mods/wPAMM/ui/mods/wPAMM'
+
+  // model.uiOptions is not yet loaded
 })()
 
 require([
@@ -14,5 +16,8 @@ require([
   _.assign(pamm, api.pamm)
   api.pamm = pamm
 
-  api.pamm.load()
+  console.log(model.uiOptions())
+  if (!model.uiOptions().nomods) {
+    api.pamm.load()
+  }
 })

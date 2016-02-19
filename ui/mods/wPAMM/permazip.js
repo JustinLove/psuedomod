@@ -19,19 +19,29 @@
     })
   }
 
-  if (window.location.href == 'coui://ui/main/main.html') {
-    pz.mount('application start')
-  }
-
-  // for possible: api.file.permazip.mounts_subscription.dispose()
-  pz.mounts_subscription = pz.mounts.subscribe(function() {
-    pz.unmountAllMemoryFiles()
-    pz.mount('mounts updated')
-  })
-
   pz.unmountAllMemoryFiles = api.file.unmountAllMemoryFiles
-  api.file.unmountAllMemoryFiles = function permazip_unmountAllMemoryFiles() {
-    pz.unmountAllMemoryFiles()
-    pz.mount('unmounted')
-  }
+
+  api.game.getSetupInfo().then(function (payload) {
+    if (parseUIOptions(payload.ui_options).nomods) {
+      if (window.location.href == 'coui://ui/main/main.html') {
+        pz.unmountAllMemoryFiles()
+      }
+      return
+    }
+
+    if (window.location.href == 'coui://ui/main/main.html') {
+      pz.mount('application start')
+    }
+
+    // for possible: api.file.permazip.mounts_subscription.dispose()
+    pz.mounts_subscription = pz.mounts.subscribe(function() {
+      pz.unmountAllMemoryFiles()
+      pz.mount('mounts updated')
+    })
+
+    api.file.unmountAllMemoryFiles = function permazip_unmountAllMemoryFiles() {
+      pz.unmountAllMemoryFiles()
+      pz.mount('unmounted')
+    }
+  })
 })()
