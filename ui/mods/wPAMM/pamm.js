@@ -23,7 +23,6 @@ define([
       pamm.client.deserialize(state.client)
       pamm.server.deserialize(state.server)
       pamm.set.deserialize(state.mods)
-      pamm.set.disable().find(state.enabled).enable()
       return pamm.write()
     })
   }
@@ -33,7 +32,6 @@ define([
       pamm.client.deserialize(state.client)
       pamm.server.deserialize(state.server)
       pamm.set.deserialize(state.mods)
-      pamm.set.disable().find(state.enabled).enable()
       return pamm.write()
     })
   }
@@ -57,9 +55,18 @@ define([
     })
   }
 
+  pamm.contextEnabled = function(context) {
+    api.mods.getMounted(context).then(function(info) {
+      console.log('-- ' + context + ' --')
+      info.mounted_mods.forEach(function(mod) {
+        console.log(mod.identifier)
+      })
+    })
+  }
+
   pamm.engineEnabled = function() {
-    pamm.client.engineEnabled()
-    pamm.server.engineEnabled()
+    pamm.contextEnabled('client')
+    pamm.contextEnabled('server')
   }
 
   return pamm

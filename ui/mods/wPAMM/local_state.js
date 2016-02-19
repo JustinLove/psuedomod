@@ -5,6 +5,12 @@ define([
 ], function(Collection, FilesystemScan, DownloadScan) {
   "use strict";
 
+  var exclude = [
+    'com.pa.deathbydenim.dpamm',
+    'com.pa.raevn.rpamm',
+    'com.pa.pamm.server',
+  ]
+
   var key = 'com.wondible.pa.pamm.mods'
 
   var join = function(promises) {
@@ -97,7 +103,16 @@ define([
           }
         })
       }),
-    ]).then(function() {return state})
+    ]).then(function() {
+      state.mods = state.mods.filter(function(mod) {
+        return exclude.indexOf(mod.identifier) == -1
+      })
+      state.enabled = _.difference(state.enabled, exclude)
+      state.mods.forEach(function(mod) {
+        mod.enabled = state.enabled.indexOf(mod.identifier) != -1
+      })
+      return state
+    })
   }
 
   return {

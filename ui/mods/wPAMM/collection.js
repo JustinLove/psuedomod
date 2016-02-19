@@ -139,16 +139,6 @@ define([
     my.mounts = state.mounts || {}
   }
 
-  Collection.prototype.engineEnabled = function() {
-    var my = this
-    api.mods.getMountedMods(my.context, function(mods) {
-      console.log(['--', my.context, '--'])
-      mods.forEach(function(mod) {
-        console.log(mod.identifier)
-      })
-    })
-  }
-
   Collection.prototype.installed = function() {
     var my = this
     console.log(['--', my.context, '--'])
