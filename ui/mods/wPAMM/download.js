@@ -5,11 +5,10 @@ define([], function() {
   var starting
 
   var startNext = function() {
-    console.log('attempt to start while', starting)
     starting = undefined
     for (var filename in fileStatus) {
       if (fileStatus[filename].status == 'new') {
-        console.log('begin', filename)
+        //console.log('begin', filename)
         fileStatus[filename].status = 'started'
         api.download.start(fileStatus[filename].url, filename)
         starting = filename
@@ -38,7 +37,7 @@ define([], function() {
     onDownload(status)
 
     if (status.file.match('com.wondible.pa.pamm.')) return
-    console.log(status)
+    //console.log(status)
 
     if (status.progress > status.size) {
       status.percent = 0
@@ -46,7 +45,6 @@ define([], function() {
       status.percent = status.progress/status.size
     }
 
-    console.log('starting before', starting)
     var info = fileStatus[status.file]
     if (info) {
       if (starting == info.filename) startNext()
@@ -56,12 +54,25 @@ define([], function() {
       delete fileStatus[starting]
       startNext()
     }
-    console.log('starting after', starting)
 
     if (info) {
       if (status.state == 'complete') {
-        info.promise.resolve(status)
-        delete fileStatus[status.file]
+        if (status.file == info.filename) {
+          info.promise.resolve(status)
+          delete fileStatus[status.file]
+        } else {
+          api.download.move(status.file, info.filename).then(function() {
+            var filename = info.filename
+            console.info('renamed', status.file, filename)
+            delete fileStatus[status.file]
+            status.file = filename
+            info.promise.resolve(status)
+          }, function() {
+            console.error('failed to move', status.file, info.filename, arguments)
+            info.promise.resolve(status)
+            delete fileStatus[status.file]
+          })
+        }
       } else if (status.state == 'activated' || status.state == 'downloading') {
         info.promise.notify(status)
         info.status = status.state
