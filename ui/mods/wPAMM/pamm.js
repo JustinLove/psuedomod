@@ -1,16 +1,16 @@
 define([
-  'pamm/registry',
+  'pamm/available',
   'pamm/mod_set',
   'pamm/context',
   'pamm/local_state',
-], function(registry, ModSet, Context, local_state) {
+], function(available, ModSet, Context, local_state) {
   "use strict";
 
   // functionality required synchronously is in start.js
 
   var pamm = new ModSet()
 
-  pamm.available = registry
+  pamm.available = available
 
   pamm.load = function() {
     return local_state.load().then(function(state) {

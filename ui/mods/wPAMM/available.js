@@ -26,6 +26,15 @@ define([
     return promise
   }
 
+  var removeOtherFile = function(mod, filename) {
+    var installed = api.pamm.find([mod.identifier]).forEach(function(installed) {
+      if (installed.zippath != '/download/'+filename) {
+        api.download.delete(installed.zippath.replace('/download/', ''))
+        delete installed.zippath
+      }
+    })
+  }
+
   ModSet.prototype.setInstall = function() {
     this.forEach(function(mod) {
       if (!mod.url) {
@@ -33,6 +42,7 @@ define([
         return
       }
       return download.fetch(mod.url, mod.identifier + '.zip').then(function(status) {
+        removeOtherFile(mod, status.file)
         return fix_paths(status.file)
       })
     })
