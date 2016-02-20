@@ -18,6 +18,10 @@ define(['pamm/lib/jszip'], function(JSZip) {
     _.each(files, function(content, path) {
       zip.file(path, content)
     })
+    return writeZip(zip, filename)
+  }
+
+  var writeZip = function(zip, filename) {
     var blob = zip.generate({type: 'blob'})
     var url = window.URL.createObjectURL(blob)
     return download(url, filename)
@@ -85,6 +89,7 @@ define(['pamm/lib/jszip'], function(JSZip) {
     mountZippedFiles: mountZippedFiles,
     zip: {
       create: createZip,
+      write: writeZip,
       read: readZip,
     },
   }
