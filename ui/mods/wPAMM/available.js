@@ -46,6 +46,19 @@ define([
         return fix_paths(status.file)
       })
     })
+    return this
+  }
+
+  ModSet.prototype.setUninstall = function() {
+    this.setDisable().forEach(function(mod) {
+      if (!mod.zippath) {
+        console.error(mod.identifier, 'has no zip to uninstall')
+        return
+      }
+      api.download.delete(mod.zippath.replace('/download/', ''))
+      delete mod.zippath
+    })
+    return this
   }
 
   return available
