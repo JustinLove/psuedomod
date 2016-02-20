@@ -3,13 +3,14 @@ define([
   'pamm/mod_set',
   'pamm/context',
   'pamm/local_state',
-  'pamm/fix_paths',
-], function(registry, ModSet, Context, local_state, fix_paths) {
+], function(registry, ModSet, Context, local_state) {
   "use strict";
 
   // functionality required synchronously is in start.js
 
   var pamm = new ModSet()
+
+  pamm.available = registry
 
   pamm.load = function() {
     return local_state.load().then(function(state) {
@@ -50,8 +51,6 @@ define([
       return true
     })
   }
-
-  pamm.fixPaths = fix_paths
 
   pamm.contextEnabled = function(context) {
     api.mods.getMounted(context).then(function(info) {
