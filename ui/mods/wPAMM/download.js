@@ -8,7 +8,7 @@ define([], function() {
     starting = undefined
     for (var filename in fileStatus) {
       if (fileStatus[filename].status == 'new') {
-        //console.log('begin', filename)
+        console.log('begin', filename)
         fileStatus[filename].status = 'started'
         api.download.start(fileStatus[filename].url, filename)
         starting = filename
@@ -23,7 +23,7 @@ define([], function() {
       filename = parts[parts.length-1]
     }
     fileStatus[filename] = {
-      promise: $.Deferred(),
+      promise: engine.createDeferred(),
       url: url,
       filename: filename,
       status: 'new',
@@ -36,7 +36,6 @@ define([], function() {
   api.download.onDownload = function(status) {
     onDownload(status)
 
-    if (status.file.match('com.wondible.pa.pamm.')) return
     //console.log(status)
 
     if (status.progress > status.size) {
@@ -74,7 +73,6 @@ define([], function() {
           })
         }
       } else if (status.state == 'activated' || status.state == 'downloading') {
-        info.promise.notify(status)
         info.status = status.state
       } else {
         console.error('unhandled download state ' + status.state)

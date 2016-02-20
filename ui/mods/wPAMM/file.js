@@ -1,4 +1,4 @@
-define(['pamm/lib/jszip'], function(JSZip) {
+define(['pamm/download', 'pamm/lib/jszip'], function(download, JSZip) {
   "use strict";
 
   var mountZippedFiles = function(files, filename, root) {
@@ -24,35 +24,7 @@ define(['pamm/lib/jszip'], function(JSZip) {
   var writeZip = function(zip, filename) {
     var blob = zip.generate({type: 'blob'})
     var url = window.URL.createObjectURL(blob)
-    return download(url, filename)
-  }
-
-  var download = function(url, filename) {
-    var promise = engine.createDeferred()
-    api.download.start(url, filename)
-    watchDownload(url, filename, promise)
-    return promise
-  }
-
-  var watchDownload = function(url, filename, promise) {
-    api.download.status(filename).then(function(status) {
-      //console.log(status)
-      //console.log(status.state)
-      if (status.state == 'complete') {
-        URL.revokeObjectURL(url)
-        promise.resolve(status)
-      } else if (status.state == 'activated' || status.state == 'downloading') {
-        setTimeout(watchDownload, 100, url, filename, promise)
-      } else {
-        console.error('unhandled download state ' + status.state)
-        console.warn(status)
-        promise.reject(status)
-        URL.revokeObjectURL(url)
-      }
-    }, function(err) {
-      promise.reject(err)
-      console.warn('download status failed', err)
-    })
+    return download.fetch(url, filename)
   }
 
   var loadBinary = function(url, type) {

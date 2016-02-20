@@ -106,7 +106,8 @@ define([], function() {
 
   ModSet.prototype.setEnable = function() {
     this.forEach(function(mod) {
-      if (neverEnable.indexOf(mod.identifier) == -1) {
+      if ((mod.installpath || mod.zippath)
+          && neverEnable.indexOf(mod.identifier) == -1) {
         mod.enabled = true
       }
     })
