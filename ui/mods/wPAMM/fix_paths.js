@@ -7,14 +7,18 @@ define(['pamm/file'], function(file) {
         var name = infos[0].name
         var keep = name.match(/[^/]+\/modinfo.json$/)[0]
         var remove = name.replace(keep, '')
+        if (remove == '') return zip
+        console.info('fix', path, 'removing', remove)
         Object.keys(zip.files).forEach(function(path) {
           var fixed = path.replace(remove, '')
+          if (fixed == path) return
+          var obj = zip.files[path]
+          delete zip.files[path]
           // OSX helpfully adds an extra dir when opening files without a base directory
           if (fixed != ''){ // && fixed.match('/')) {
-            zip.files[fixed] = zip.files[path]
-            zip.files[fixed].name = fixed
+            zip.files[fixed] = obj
+            obj.name = fixed
           }
-          delete zip.files[path]
         })
         //console.log(zip)
         return file.zip.write(zip, path)
