@@ -19,6 +19,12 @@ define([
 
   pamm.refresh = function() {
     return local_state.refresh().then(function(state) {
+      var enabled = pamm.enabled().getIdentifiers()
+      state.mods.forEach(function(mod) {
+        if (!mod.enabled) {
+          mod.enabled = enabled.indexOf(mod.identifier) != -1
+        }
+      })
       pamm.deserialize(state.mods)
       return pamm.write()
     })
