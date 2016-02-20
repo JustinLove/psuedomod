@@ -1,18 +1,36 @@
 define([], function() {
   "use strict";
 
-  var promises = {}
+  var fileStatus = {}
   var starting
+
+  var startNext = function() {
+    console.log('attempt to start while', starting)
+    starting = undefined
+    for (var filename in fileStatus) {
+      if (fileStatus[filename].status == 'new') {
+        console.log('begin', filename)
+        fileStatus[filename].status = 'started'
+        api.download.start(fileStatus[filename].url, filename)
+        starting = filename
+        return
+      }
+    }
+  }
 
   var fetch = function(url, filename) {
     if (!filename) {
       var parts = url.split('/')
       filename = parts[parts.length-1]
     }
-    promises[filename] = $.Deferred()
-    starting = filename
-    api.download.start(url, filename)
-    return promises[filename]
+    fileStatus[filename] = {
+      promise: $.Deferred(),
+      url: url,
+      filename: filename,
+      status: 'new',
+    }
+    if (!starting) startNext()
+    return fileStatus[filename].promise
   }
 
   var onDownload = api.download.onDownload
@@ -28,25 +46,30 @@ define([], function() {
       status.percent = status.progress/status.size
     }
 
-    if (promises[status.file]) {
-      var promise = promises[status.file]
-      if (status.file == starting) starting = undefined
+    console.log('starting before', starting)
+    var info = fileStatus[status.file]
+    if (info) {
+      if (starting == info.filename) startNext()
     } else if (starting) {
-      var promise = promises[starting]
-      promises[status.file] = promise
-      delete promises[starting]
-      starting = undefined
+      info = fileStatus[starting]
+      fileStatus[status.file] = info
+      delete fileStatus[starting]
+      startNext()
     }
+    console.log('starting after', starting)
 
-    if (promise) {
+    if (info) {
       if (status.state == 'complete') {
-        promise.resolve(status)
-        delete promise[status.file]
-      } else if (status.state == 'failed') {
-        promise.reject(status)
-        delete promise[status.file]
+        info.promise.resolve(status)
+        delete fileStatus[status.file]
+      } else if (status.state == 'activated' || status.state == 'downloading') {
+        info.promise.notify(status)
+        info.status = status.state
       } else {
-        promise.notify(status)
+        console.error('unhandled download state ' + status.state)
+        console.warn(status)
+        info.promise.reject(status)
+        delete fileStatus[status.file]
       }
     }
   }

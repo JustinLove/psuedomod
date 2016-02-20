@@ -17,7 +17,7 @@ require([
   _.assign(pamm, api.pamm)
   api.pamm = pamm
 
-  //download.fetch('coui://download/two_color_icons.zip', 'tci.foo')
+  download.fetch('coui://download/two_color_icons.zip', 'tci.foo')
   download.fetch('https://github.com/Stuart1998/ClassicWater/archive/oldwater_v1.0.zip')
     .then(function(status) {
       console.log('success', status)
