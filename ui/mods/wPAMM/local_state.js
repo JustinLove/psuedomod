@@ -126,7 +126,7 @@ define([
       } else {
         mod.timestamp = timestamp
         var date = new Date(timestamp)
-        mod.date = (1900+date.getYear()) + '-' + zeroPad(1+date.getMonth()) + '-' + zeroPad(date.getDate());
+        mod.date = (1900+date.getYear()) + '-' + zeroPad(1+date.getMonth()) + '-' + zeroPad(1+date.getDate());
       }
     } else {
       mod.date = 'Unknown';
