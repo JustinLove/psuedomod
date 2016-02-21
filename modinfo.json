@@ -16,6 +16,9 @@
     "start": [
       "coui://ui/mods/wPAMM/start.js"
     ],
+    "mods": [
+      "coui://ui/mods/wPAMM/start.js"
+    ],
     "settings": [
       "coui://ui/mods/wPAMM/settings.js"
     ]

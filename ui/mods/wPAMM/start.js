@@ -16,7 +16,11 @@ require([
   _.assign(pamm, api.pamm)
   api.pamm = pamm
 
-  if (!model.uiOptions().nomods) {
-    api.pamm.load()
-  }
+  if (model.uiOptions && model.uiOptions().nomods) return
+
+  api.pamm.load().then(function() {
+    if (model.installedMods) {
+      model.installedMods(api.pamm.serialize())
+    }
+  })
 })

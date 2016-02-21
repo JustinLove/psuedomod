@@ -97,6 +97,11 @@ define([
       state.enabled = _.difference(state.enabled, exclude)
       state.mods.forEach(function(mod) {
         mod.enabled = state.enabled.indexOf(mod.identifier) != -1
+
+        // ui compatiblity
+        mod.installed = true
+        mod.fileSystem = mod.installpath
+        mod.icon = mod.icon || ''
       })
       delete state.enabled
       return state
