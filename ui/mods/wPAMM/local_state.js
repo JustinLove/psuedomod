@@ -97,16 +97,39 @@ define([
       state.enabled = _.difference(state.enabled, exclude)
       state.mods.forEach(function(mod) {
         mod.enabled = state.enabled.indexOf(mod.identifier) != -1
-
-        // ui compatiblity
-        mod.installed = true
-        mod.fileSystem = !!mod.installedPath
-        mod.installedPath = mod.installedPath || ''
-        mod.icon = mod.icon || ''
+        normalizeMod(mod)
       })
       delete state.enabled
       return state
     })
+  }
+
+  var normalizeMod = function(mod) {
+    mod.installed = true
+    mod.fileSystem = !!mod.installedPath
+    mod.installedPath = mod.installedPath || ''
+    mod.icon = mod.icon || ''
+    mod.build = mod.build || 'Unknown'
+    mod.display_name = mod.display_name || mod.identifier
+    mod.description = mod.description || ''
+    mod.author = mod.author || ''
+    mod.forum = mod.forum || ''
+    mod.dependencies = mod.dependencies || []
+
+    if ( mod.date ) {
+      var timestamp = Date.parse( mod.date );
+
+      if ( isNaN( timestamp ) ) {
+        mod.timestamp = 0;
+      } else {
+        mod.timestamp = timestamp
+        var date = new Date(timestamp)
+        mod.date = date.getYear() + '-' + date.getMonth() + '-' + date.getDate();
+      }
+    } else {
+      mod.date = 'Unknown';
+      mod.timestamp = 0;
+    }
   }
 
   return {
