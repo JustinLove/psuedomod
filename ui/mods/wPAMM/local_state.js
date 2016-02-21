@@ -5,6 +5,8 @@ define([
   "use strict";
 
   var exclude = [
+    'com.wondible.pa.pamm.client',
+    'com.wondible.pa.pamm.server',
     'com.pa.deathbydenim.dpamm',
     'com.pa.raevn.rpamm',
     'com.pa.pamm.server',
