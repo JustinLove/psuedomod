@@ -25,6 +25,8 @@ define(['pamm/file'], function(file) {
   }
 
   var reorganize = function(zip, from, to) {
+    from = new RegExp('^'+from)
+
     Object.keys(zip.files).forEach(function(path) {
       if (!path.match(from)) {
         delete zip.files[path]
@@ -45,23 +47,21 @@ define(['pamm/file'], function(file) {
     })
   }
 
-  var fix = function(path, identifier) {
-    return file.zip.read('coui://download/'+path).then(function(zip) {
+  var fix = function(source, target, identifier) {
+    return file.zip.read('coui://download/'+source).then(function(zip) {
       //console.log(zip)
 
       var info = locateModinfo(zip, identifier)
       if (!info) return false
 
-      var name = info.name
-      var keep = name.match(/modinfo.json$/)[0]
-      var remove = name.replace(keep, '')
-      if (remove == '') return zip
+      var basepath = info.name.match(/^(.*)modinfo.json$/)[1]
 
-      console.info(path, 'rename', remove, '->', identifier)
-      reorganize(zip, remove, identifier+'/')
-      //console.log(zip)
-      api.download.delete(path)
-      return file.zip.write(zip, path.replace(/.zip$/, '-fixed.zip'))
+      if (basepath && basepath != '') {
+        console.info(source, 'rename', basepath, '->', identifier)
+        reorganize(zip, basepath, identifier+'/')
+        //console.log(zip)
+      }
+      return file.zip.write(zip, target)
     })
   }
 

@@ -41,9 +41,18 @@ define([
         console.error(mod.identifier, 'has no url to install')
         return
       }
-      return download.fetch(mod.url, mod.identifier + '.zip').then(function(status) {
-        removeOtherFile(mod, status.file)
-        return fix_paths(status.file, mod.identifier)
+      var cache = 'cache-'+mod.identifier + '_v' + mod.version + '.zip'
+      var target = mod.identifier + '.zip'
+      return api.download.list().then(function(downloads) {
+        if (downloads.indexOf(cache) == -1) {
+          return download.fetch(mod.url, cache).then(function(status) {
+            removeOtherFile(mod, status.file)
+            return fix_paths(status.file, target, mod.identifier)
+          })
+        } else {
+          removeOtherFile(mod, cache)
+          return fix_paths(cache, target, mod.identifier)
+        }
       })
     })
     return this

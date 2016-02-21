@@ -30,6 +30,9 @@ define(['pamm/file'], function(file) {
       if (!path.match(/\.zip$/)) {
         return
       }
+      if (path.match(/^cache-/)) {
+        return
+      }
       my.pending++
       file.zip.read('coui://download/'+path).then(function(zip) {
         //console.log(path, zip)
