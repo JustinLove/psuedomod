@@ -53,6 +53,7 @@ define([
       mods: [],
       enabled: [],
     }
+
     return join([
       new FilesystemScan().scan('/client_mods/').then(function(scan) {
         console.log('client found', scan.mods.length, 'enabled', scan.enabled.length)
@@ -77,7 +78,8 @@ define([
         })
       }),
       new DownloadScan().scan().then(function(scan) {
-        console.log('download found', scan.mods.length)
+        console.log('download found', scan.mods.length, 'enabled', scan.enabled.length)
+        state.enabled = state.enabled.concat(scan.enabled)
         scan.mods.forEach(function(info) {
           if (info.context == 'client') {
             state.mods.push(info)

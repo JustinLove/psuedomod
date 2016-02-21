@@ -17,6 +17,12 @@ define(['pamm/file'], function(file) {
     //console.log(info.identifier)
   }
 
+  Scan.prototype.loadEnabledMods = function(file) {
+    var my = this
+    var mods = JSON.parse(file.asText())
+    my.enabled = my.enabled.concat(mods.mount_order)
+  }
+
   Scan.prototype.registerMods = function(paths) {
     var my = this
     paths.forEach(function(path) {
@@ -27,19 +33,32 @@ define(['pamm/file'], function(file) {
       my.pending++
       file.zip.read('coui://download/'+path).then(function(zip) {
         //console.log('zip', zip)
+
+        var mods = zip.file('mods.json')
+        if (mods) {
+          my.loadEnabledMods(mods)
+        } else {
+          mods = zip.file(/mods.json$/)
+          if (mods.length > 0) {
+            console.warn(path, mods.length, 'possible misplaced mods.json')
+            mods.forEach(function(file) {console.log('', file.name)})
+          }
+        }
+
         var infos = zip.file(/^\/?[^/]+\/modinfo.json$/)
         if (infos.length == 1) {
           my.addModinfo('/download/' + path, infos[0])
           my.resolve()
           return
         }
-        var infos = zip.file(/modinfo.json$/)
+        infos = zip.file(/modinfo.json$/)
         if (infos.length > 0) {
           console.warn(path, infos.length, 'possible misplaced modinfo')
           infos.forEach(function(file) {console.log('', file.name)})
         } else {
           console.warn(path, 'had no modinfo')
         }
+
         my.resolve()
       }, function(err) {
         console.warn(path, 'could not be listed', err)
