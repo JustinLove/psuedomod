@@ -124,12 +124,17 @@ define([
       } else {
         mod.timestamp = timestamp
         var date = new Date(timestamp)
-        mod.date = date.getYear() + '-' + date.getMonth() + '-' + date.getDate();
+        mod.date = (1900+date.getYear()) + '-' + zeroPad(1+date.getMonth()) + '-' + zeroPad(date.getDate());
       }
     } else {
       mod.date = 'Unknown';
       mod.timestamp = 0;
     }
+  }
+
+  var zeroPad = function(n) {
+    var s = '0'+n.toString()
+    return s.slice(s.length - 2)
   }
 
   return {
