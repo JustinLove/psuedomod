@@ -32,7 +32,7 @@ define(['pamm/file'], function(file) {
       }
       my.pending++
       file.zip.read('coui://download/'+path).then(function(zip) {
-        //console.log('zip', zip)
+        //console.log(path, zip)
 
         var mods = zip.file('mods.json')
         if (mods) {

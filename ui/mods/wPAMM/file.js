@@ -31,6 +31,8 @@ define(['pamm/download', 'pamm/lib/jszip'], function(download, JSZip) {
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url);
     xhr.responseType = type || 'arraybuffer'
+    //xhr.setRequestHeader('Pragma', 'no-cache')
+    //xhr.setRequestHeader('Cache-Control', 'no-cache')
     var promise = engine.createDeferred()
 
     xhr.onload = function () {

@@ -43,7 +43,7 @@ define([
       }
       return download.fetch(mod.url, mod.identifier + '.zip').then(function(status) {
         removeOtherFile(mod, status.file)
-        return fix_paths(status.file)
+        return fix_paths(status.file, mod.identifier)
       })
     })
     return this
