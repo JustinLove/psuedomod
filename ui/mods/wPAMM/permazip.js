@@ -26,27 +26,29 @@
   // automatic mount/unmount in atlas can cause infinite loop
   if (window.location.protocol == 'atlas:') return
 
+  // for possible: api.file.permazip.mounts_subscription.dispose()
+  pz.mounts_subscription = pz.mounts.subscribe(function() {
+    pz.unmountAllMemoryFiles()
+    pz.mount('mounts updated')
+  })
+
+  api.file.unmountAllMemoryFiles = function permazip_unmountAllMemoryFiles() {
+    pz.unmountAllMemoryFiles()
+    pz.mount('unmounted')
+  }
+
   api.game.getSetupInfo().then(function (payload) {
     if (parseUIOptions(payload.ui_options).nomods) {
+      pz.mounts_subscription.dispose()
+      api.file.unmountAllMemoryFiles = pz.unmountAllMemoryFiles
+
       if (window.location.href == 'coui://ui/main/main.html') {
         pz.unmountAllMemoryFiles()
       }
-      return
-    }
-
-    if (window.location.href == 'coui://ui/main/main.html') {
-      pz.mount('application start')
-    }
-
-    // for possible: api.file.permazip.mounts_subscription.dispose()
-    pz.mounts_subscription = pz.mounts.subscribe(function() {
-      pz.unmountAllMemoryFiles()
-      pz.mount('mounts updated')
-    })
-
-    api.file.unmountAllMemoryFiles = function permazip_unmountAllMemoryFiles() {
-      pz.unmountAllMemoryFiles()
-      pz.mount('unmounted')
+    } else {
+      if (window.location.href == 'coui://ui/main/main.html') {
+        pz.mount('application start')
+      }
     }
   })
 })()
