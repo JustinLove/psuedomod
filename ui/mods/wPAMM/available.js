@@ -5,7 +5,7 @@ define([
 ], function(ModSet, download, fix_paths) {
   "use strict";
 
-  var registryUrl = 'https://pamm-mereth.rhcloud.com/api/mod'
+  var registryUrl = 'https://palobby.com/api/mods/'
   //var url = registryUrl
   var url = 'coui://download/available_mods.json'
 
@@ -28,9 +28,9 @@ define([
 
   var removeOtherFile = function(mod, filename) {
     var installed = api.pamm.find([mod.identifier]).forEach(function(installed) {
-      if (installed.zippath != '/download/'+filename) {
-        api.download.delete(installed.zippath.replace('/download/', ''))
-        delete installed.zippath
+      if (installed.zipPath != '/download/'+filename) {
+        api.download.delete(installed.zipPath.replace('/download/', ''))
+        delete installed.zipPath
       }
     })
   }
@@ -51,12 +51,12 @@ define([
 
   ModSet.prototype.setUninstall = function() {
     this.setDisable().forEach(function(mod) {
-      if (!mod.zippath) {
+      if (!mod.zipPath) {
         console.error(mod.identifier, 'has no zip to uninstall')
         return
       }
-      api.download.delete(mod.zippath.replace('/download/', ''))
-      delete mod.zippath
+      api.download.delete(mod.zipPath.replace('/download/', ''))
+      delete mod.zipPath
     })
     return this
   }

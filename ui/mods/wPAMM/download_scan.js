@@ -12,7 +12,7 @@ define(['pamm/file'], function(file) {
     //console.log('addmodinfo', path, file)
     var my = this
     var info = JSON.parse(file.asText())
-    info.zippath = path
+    info.zipPath = path
     my.mods.push(info)
     //console.log(info.identifier)
   }

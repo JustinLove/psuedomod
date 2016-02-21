@@ -12,7 +12,7 @@ define([], function() {
     var my = this
     my.pending++
     $.get('coui:/'+path).then(function(info) {
-      info.installpath = path
+      info.installedPath = path
       my.mods.push(info)
       //console.log(info.identifier)
       my.resolve()

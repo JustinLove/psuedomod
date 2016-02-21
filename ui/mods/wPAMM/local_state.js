@@ -62,7 +62,7 @@ define([
           if (info.context == 'client') {
             state.mods.push(info)
           } else {
-            console.error(info.identifier, info.installpath || info.zippath, 'unknown mod context', info.context)
+            console.error(info.identifier, info.zipPath || info.installedPath, 'unknown mod context', info.context)
           }
         })
       }),
@@ -73,7 +73,7 @@ define([
           if (info.context == 'server') {
             state.mods.push(info)
           } else {
-            console.error(info.identifier, info.installpath || info.zippath, 'unknown mod context', info.context)
+            console.error(info.identifier, info.zipPath || info.installedPath, 'unknown mod context', info.context)
           }
         })
       }),
@@ -86,7 +86,7 @@ define([
           } else if (info.context == 'server') {
             state.mods.push(info)
           } else {
-            console.error(info.identifier, info.installpath || info.zippath, 'unknown mod context', info.context)
+            console.error(info.identifier, info.zipPath || info.installedPath, 'unknown mod context', info.context)
           }
         })
       }),
@@ -100,7 +100,8 @@ define([
 
         // ui compatiblity
         mod.installed = true
-        mod.fileSystem = mod.installpath
+        mod.fileSystem = !!mod.installedPath
+        mod.installedPath = mod.installedPath || ''
         mod.icon = mod.icon || ''
       })
       delete state.enabled

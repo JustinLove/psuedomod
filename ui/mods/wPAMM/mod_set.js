@@ -52,11 +52,11 @@ define([], function() {
   }
 
   ModSet.prototype.filesystem = function() {
-    return this.filter(function(mod) {return mod.installpath})
+    return this.filter(function(mod) {return mod.installedPath && mod.installedPath != ''})
   }
 
   ModSet.prototype.zip = function() {
-    return this.filter(function(mod) {return mod.zippath})
+    return this.filter(function(mod) {return mod.zipPath})
   }
 
   ModSet.prototype.find = function(identifiers) {
@@ -85,8 +85,8 @@ define([], function() {
   ModSet.prototype.getMounts = function(path) {
     var mounts = {}
     this.zip().forEach(function(mod) {
-      //console.log('will mount ', my.mods[i].zippath)
-      mounts[mod.zippath] = path
+      //console.log('will mount ', my.mods[i].zipPath)
+      mounts[mod.zipPath] = path
     })
     return mounts
   }
@@ -106,7 +106,7 @@ define([], function() {
 
   ModSet.prototype.setEnable = function() {
     this.forEach(function(mod) {
-      if ((mod.installpath || mod.zippath)
+      if ((mod.zipPath || (mod.installedPath && mod.installedPath != ''))
           && neverEnable.indexOf(mod.identifier) == -1) {
         mod.enabled = true
       }
