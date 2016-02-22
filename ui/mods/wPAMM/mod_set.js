@@ -93,7 +93,9 @@ define([], function() {
     var expanded = new ModSet(my.serialize())
     expanded.root = root
     var has = expanded.getIdentifiers()
-    var needs = _.uniq(_.flatten(my.map(function(mod) {return mod.dependencies})))
+    var needs = _.uniq(_.flatten(_.compact(
+      my.map(function(mod) { return mod.dependencies })
+    )))
     var missing = []
     var crazy = 0
     while (needs.length > 0 && crazy++ < 100) {
