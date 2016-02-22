@@ -70,6 +70,23 @@ define([], function() {
     })
   }
 
+  var corpus = function(mod) {
+    return [
+      mod.display_name.toLowerCase(),
+      mod.description.toLowerCase(),
+      mod.author.toLowerCase(),
+      (mod.category || []).join(',').toLowerCase()
+    ].join(';')
+  }
+
+  ModSet.prototype.search = function(text) {
+    text = text.toLowerCase()
+    return this.filter(function(mod) {
+      if (!mod.copus) mod.corpus = corpus(mod)
+      return mod.corpus.match(text)
+    })
+  }
+
   ModSet.prototype.withDependencies = function() {
     var my = this
     var root = my.root || my

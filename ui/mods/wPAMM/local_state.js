@@ -116,6 +116,7 @@ define([
     mod.description = mod.description || ''
     mod.author = mod.author || ''
     mod.forum = mod.forum || ''
+    mod.category || []
     mod.dependencies = mod.dependencies || []
 
     if ( mod.date ) {
