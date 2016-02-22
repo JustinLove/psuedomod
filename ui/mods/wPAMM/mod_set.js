@@ -81,25 +81,43 @@ define([], function() {
     var crazy = 0
     while (needs.length > 0 && crazy++ < 100) {
       var id = needs.pop()
-      var found = false
-      for (var i = 0;i < root.length;i++) {
-        var mod = root[i]
-        if (mod.identifier == id) {
-          expanded.push(mod)
-          has.push(mod.identifier)
-          if (mod.dependencies && mod.dependencies.length > 0) {
-            needs = _.difference(mod.dependencies, has, needs, missing).concat(needs)
-          }
-          found = true
-          break
+      var mod = _.find(root, {identifier: id})
+      if (mod) {
+        expanded.push(mod)
+        has.push(mod.identifier)
+        if (mod.dependencies && mod.dependencies.length > 0) {
+          needs = _.difference(mod.dependencies, has, needs, missing).concat(needs)
         }
-      }
-      if (!found) {
+      } else {
         console.warn(id, 'dependency not found')
         missing.push(id)
       }
     }
     expanded.missing = missing
+    return expanded
+  }
+
+  ModSet.prototype.withConsumers = function() {
+    var my = this
+    var root = my.root || my
+    var expanded = new ModSet(my.serialize())
+    expanded.root = root
+    var has = expanded.getIdentifiers()
+    var work = has.slice(0)
+    var crazy = 0
+    while (work.length > 0 && crazy++ < 100) {
+      var id = work.pop()
+      for (var i in root) {
+        var mod = root[i]
+        if (mod.dependencies
+         && mod.dependencies.indexOf(id) != -1
+         && has.indexOf(mod.identifier) == -1) {
+          expanded.push(mod)
+          has.push(mod.identifier)
+          work.push(mod.identifier)
+        }
+      }
+    }
     return expanded
   }
 
