@@ -31,8 +31,12 @@ define([], function() {
 
   ModSet.prototype.splice = Array.prototype.splice
 
+  ModSet.prototype.push = Array.prototype.push
+
   ModSet.prototype.filter = function(f) {
-    return new ModSet(Array.prototype.filter.call(this, f))
+    var set = new ModSet(Array.prototype.filter.call(this, f))
+    set.root = this.root || this
+    return set
   }
 
   ModSet.prototype.enabled = function() {
@@ -64,6 +68,39 @@ define([], function() {
     return this.filter(function(mod) {
       return identifiers.indexOf(mod.identifier) != -1
     })
+  }
+
+  ModSet.prototype.withDependencies = function() {
+    var my = this
+    var root = my.root || my
+    var expanded = new ModSet(my.serialize())
+    expanded.root = root
+    var has = expanded.getIdentifiers()
+    var needs = _.uniq(_.flatten(my.map(function(mod) {return mod.dependencies})))
+    var missing = []
+    var crazy = 0
+    while (needs.length > 0 && crazy++ < 100) {
+      var id = needs.pop()
+      var found = false
+      for (var i = 0;i < root.length;i++) {
+        var mod = root[i]
+        if (mod.identifier == id) {
+          expanded.push(mod)
+          has.push(mod.identifier)
+          if (mod.dependencies && mod.dependencies.length > 0) {
+            needs = _.difference(mod.dependencies, has, needs, missing).concat(needs)
+          }
+          found = true
+          break
+        }
+      }
+      if (!found) {
+        console.warn(id, 'dependency not found')
+        missing.push(id)
+      }
+    }
+    expanded.missing = missing
+    return expanded
   }
 
   ModSet.prototype.deserialize = function(state) {
