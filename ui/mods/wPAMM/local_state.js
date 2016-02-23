@@ -1,7 +1,8 @@
 define([
+  'pamm/coherent_join',
   'pamm/filesystem_scan',
   'pamm/download_scan',
-], function(FilesystemScan, DownloadScan) {
+], function(join, FilesystemScan, DownloadScan) {
   "use strict";
 
   var exclude = [
@@ -13,19 +14,6 @@ define([
   ]
 
   var key = 'com.wondible.pa.pamm.mods'
-
-  var join = function(promises) {
-    var complete = engine.createDeferred()
-    var count = promises.length
-    var done = function(v) {
-      count--
-      if (count < 1) {
-        complete.resolve(true)
-      }
-    }
-    promises.forEach(function(p) {p.always(done)})
-    return complete
-  }
 
   var save = function(state) {
     state.restored = true
@@ -144,6 +132,5 @@ define([
     load: load,
     refresh: refresh,
     save: save,
-    join: join,
   }
 })

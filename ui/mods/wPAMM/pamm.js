@@ -4,19 +4,20 @@ define([
   'pamm/mod_set',
   'pamm/context',
   'pamm/local_state',
-], function(available, install, ModSet, Context, local_state) {
+  'pamm/coherent_join',
+], function(available, install, ModSet, Context, local_state, join) {
   "use strict";
 
   ModSet.prototype.setInstall = function() {
-    this.forEach(function(mod) {
-      install.install(mod).then(function() { installed.push(mod) })
-    })
+    return join(this.map(function(mod) {
+      return install.install(mod).then(function() { installed.push(mod) })
+    }))
   }
 
   ModSet.prototype.setUninstall = function() {
-    this.setDisable().forEach(function(mod) {
-      install.uninstall(mod).then(function() { installed.remove(mod) })
-    })
+    return join(this.setDisable().map(function(mod) {
+      return install.uninstall(mod).then(function() { installed.remove(mod) })
+    }))
   }
 
   var installed = new ModSet()
@@ -55,7 +56,7 @@ define([
     var enabled = installed.enabled()
     var client = new Context(enabled.client(), 'client', '/client_mods/')
     var server = new Context(enabled.server(), 'server', '/server_mods/')
-    return local_state.join([
+    return join([
       pamm.save(),
       client.write(),
       server.write(),
