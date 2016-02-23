@@ -33,6 +33,16 @@ define([], function() {
 
   ModSet.prototype.push = Array.prototype.push
 
+  ModSet.prototype.indexOf = Array.prototype.indexOf
+
+  ModSet.prototype.remove = function(mod) {
+    var i = this.indexOf(mod)
+    if (i != -1) {
+      this.splice(i, 1)
+    }
+    return this
+  }
+
   ModSet.prototype.filter = function(f) {
     var set = new ModSet(Array.prototype.filter.call(this, f))
     set.root = this.root || this

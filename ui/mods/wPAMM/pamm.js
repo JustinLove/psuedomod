@@ -1,45 +1,58 @@
 define([
   'pamm/available',
+  'pamm/install',
   'pamm/mod_set',
   'pamm/context',
   'pamm/local_state',
-], function(available, ModSet, Context, local_state) {
+], function(available, install, ModSet, Context, local_state) {
   "use strict";
 
-  // functionality required synchronously is in start.js
+  ModSet.prototype.setInstall = function() {
+    this.forEach(function(mod) {
+      install.install(mod).then(function() { installed.push(mod) })
+    })
+  }
 
-  var pamm = new ModSet()
+  ModSet.prototype.setUninstall = function() {
+    this.setDisable().forEach(function(mod) {
+      install.uninstall(mod).then(function() { installed.remove(mod) })
+    })
+  }
 
+  var installed = new ModSet()
+  var pamm = installed
+
+  pamm.installed = installed
   pamm.available = available
 
   pamm.load = function() {
     return local_state.load().then(function(state) {
-      pamm.deserialize(state.mods)
+      installed.deserialize(state.mods)
       return pamm.write()
     })
   }
 
   pamm.refresh = function() {
     return local_state.refresh().then(function(state) {
-      var enabled = pamm.enabled().getIdentifiers()
+      var enabled = installed.enabled().getIdentifiers()
       state.mods.forEach(function(mod) {
         if (!mod.enabled) {
           mod.enabled = enabled.indexOf(mod.identifier) != -1
         }
       })
-      pamm.deserialize(state.mods)
+      installed.deserialize(state.mods)
       return pamm.write()
     })
   }
 
   pamm.save = function() {
     return local_state.save({
-      mods: pamm.serialize(),
+      mods: installed.serialize(),
     })
   }
 
   pamm.write = function() {
-    var enabled = pamm.enabled()
+    var enabled = installed.enabled()
     var client = new Context(enabled.client(), 'client', '/client_mods/')
     var server = new Context(enabled.server(), 'server', '/server_mods/')
     return local_state.join([
