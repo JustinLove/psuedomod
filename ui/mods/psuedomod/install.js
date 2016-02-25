@@ -22,6 +22,9 @@ define([
     }).then(function install_touchup(status) {
       mod.zipPath = '/download/'+status.file;
       mod.installed = true
+      return status
+    }, function install_failed(status) {
+      return status
     })
   }
 

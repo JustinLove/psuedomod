@@ -69,6 +69,13 @@ define(['pamm/file'], function(file) {
         //console.log(zip)
       }
       return file.zip.write(zip, target).then(function(status) {
+        /*
+        $.get('coui://download/'+source+'.dlmeta').then(function(sourcestatus) {
+          sourcestatus = JSON.parse(sourcestatus)
+          window.sizes = window.sizes || {}
+          console.log(window.sizes[identifier] = [sourcestatus.size, status.size, status.size / (sourcestatus.size || 1)])
+        })
+        */
         console.timeEnd('fix '+identifier)
         return status
       })
