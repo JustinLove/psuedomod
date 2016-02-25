@@ -13,6 +13,13 @@ define(['pamm/file'], function(file) {
     var my = this
     var info = JSON.parse(file.asText())
     info.zipPath = path
+    if (info.scenes) {
+      _.each(info.scenes, function(value, key) {
+        info.scenes[key] = value.map(function(path) {
+          return path.toLowerCase()
+        })
+      })
+    }
     my.mods.push(info)
     //console.log(info.identifier)
   }
