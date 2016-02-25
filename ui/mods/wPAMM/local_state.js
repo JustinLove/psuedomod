@@ -105,6 +105,7 @@ define([
     mod.author = mod.author || ''
     mod.forum = mod.forum || ''
     mod.category || []
+    if (mod.priority === undefined) mod.priority = 100
     mod.dependencies = mod.dependencies || []
 
     if ( mod.date ) {

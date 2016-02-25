@@ -73,6 +73,11 @@ define([], function() {
     return this.filter(function(mod) {return mod.zipPath})
   }
 
+  ModSet.prototype.sort = function(compare) {
+    compare = compare || function(a, b) { return a.priority - b.priority }
+    return new ModSet(Array.prototype.sort.call(this, compare))
+  }
+
   ModSet.prototype.find = function(identifiers) {
     if (!Array.isArray(identifiers)) identifiers = [identifiers]
     return this.filter(function(mod) {

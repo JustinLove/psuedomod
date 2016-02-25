@@ -8,7 +8,7 @@ define([
     this.context = context
     this.path = path
     this.identifier = 'com.wondible.pa.pamm.' + context
-    this.mods = mods
+    this.mods = mods.sort()
     this.mounts = {}
   }
 
