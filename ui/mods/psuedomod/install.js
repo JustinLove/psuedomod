@@ -19,6 +19,9 @@ define([
       } else {
         return fix_paths(cache, target, mod.identifier)
       }
+    }).then(function install_touchup(status) {
+      mod.zipPath = '/download/'+status.file;
+      mod.installed = true
     })
   }
 
@@ -27,9 +30,10 @@ define([
       console.error(mod.identifier, 'has no zip to uninstall')
       return
     }
-    var zipPath = mod.zipPath
+    var downloadItem = mod.zipPath.replace('/download/', '') 
     delete mod.zipPath
-    return api.download.delete(zipPath.replace('/download/', ''))
+    mod.installed = false
+    return api.download.delete(downloadItem)
   }
 
   return {

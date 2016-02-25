@@ -11,8 +11,6 @@ define([
   ModSet.prototype.setInstall = function() {
     return join(this.map(function(mod) {
       return install.install(mod).then(function setInstall_installed(status) {
-        mod.zipPath = '/download/'+status.file;
-        mod.installed = true
         installed.push(mod);
       }, function setInstall_failed(status) {
         console.log('install failed', status)
@@ -23,8 +21,6 @@ define([
   ModSet.prototype.setUninstall = function() {
     return join(this.setDisable().map(function(mod) {
       return install.uninstall(mod).then(function setUninstall_uninstalled() {
-        delete mod.zipPath
-        mod.installed = false
         installed.remove(mod)
       })
     }))
