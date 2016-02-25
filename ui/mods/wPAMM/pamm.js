@@ -35,13 +35,15 @@ define([
   pamm.available = available
 
   pamm.load = function() {
+    console.time('pamm.load')
     return local_state.load().then(function(state) {
       installed.deserialize(state.mods)
-      return pamm.write()
+      return pamm.write().then(function() {console.timeEnd('pamm.load')})
     })
   }
 
   pamm.refresh = function() {
+    console.time('pamm.refresh')
     return local_state.refresh().then(function(state) {
       var enabled = installed.enabled().getIdentifiers()
       state.mods.forEach(function(mod) {
@@ -50,7 +52,7 @@ define([
         }
       })
       installed.deserialize(state.mods)
-      return pamm.write()
+      return pamm.write().then(function() {console.timeEnd('pamm.refresh')})
     })
   }
 
@@ -61,6 +63,7 @@ define([
   }
 
   pamm.write = function() {
+    console.time('pamm.write')
     var enabled = installed.enabled()
     var client = new Context(enabled.client(), 'client', '/client_mods/')
     var server = new Context(enabled.server(), 'server', '/server_mods/')
@@ -70,6 +73,7 @@ define([
       server.write(),
     ]).then(function() {
       api.file.permazip.mounts(_.extend({}, client.mounts, server.mounts))
+      console.timeEnd('pamm.write')
       return true
     })
   }

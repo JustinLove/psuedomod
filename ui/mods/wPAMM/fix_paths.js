@@ -48,6 +48,7 @@ define(['pamm/file'], function(file) {
   }
 
   var fix = function(source, target, identifier) {
+    console.time('fix '+identifier)
     return file.zip.read('coui://download/'+source).then(function fix_paths_read_zip(zip) {
       //console.log(zip)
 
@@ -61,7 +62,7 @@ define(['pamm/file'], function(file) {
         reorganize(zip, basepath, identifier+'/')
         //console.log(zip)
       }
-      return file.zip.write(zip, target)
+      return file.zip.write(zip, target).then(function() {console.timeEnd('fix '+identifier)})
     })
   }
 

@@ -35,6 +35,7 @@ define([
   }
 
   var refresh = function() {
+    console.time('scan')
     // prevent feedback on filesystem scans
     api.file.permazip.unmountAllMemoryFiles()
 
@@ -90,6 +91,7 @@ define([
         normalizeMod(mod)
       })
       delete state.enabled
+      console.timeEnd('scan')
       return state
     })
   }

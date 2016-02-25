@@ -22,7 +22,9 @@ define(['pamm/download', 'pamm/lib/jszip'], function(download, JSZip) {
   }
 
   var writeZip = function(zip, filename) {
+    console.time('generate '+filename)
     var blob = zip.generate({type: 'blob'})
+    console.timeEnd('generate '+filename)
     var url = window.URL.createObjectURL(blob)
     return download.fetch(url, filename)
   }

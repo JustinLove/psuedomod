@@ -6,6 +6,7 @@
   pz.mount = function permazip_mount(reason) {
     var loadMods = api.settings.isSet('ui', 'pamm_load_mods', true) || 'LOAD'
     if (loadMods == 'OFF') return
+    console.time('mount')
     var promises = []
     var total = Object.keys(pz.mounts()).length
     var count = total
@@ -14,7 +15,10 @@
       api.file.zip.mount(zip, root).always(function mount_countdown() {
         count--
         if (count < 1) {
-          api.content.remount()
+          console.time('remount')
+          engine.call('content.mountUntilReset', api.content.active()).then(function() {console.timeEnd('remount')})
+          //api.content.remount().then(function() {console.timeEnd('remount')})
+          console.timeEnd('mount')
           console.log('permazip mounted ' + total.toString() + ': ' + reason)
         }
       })
@@ -51,4 +55,6 @@
       }
     }
   })
+  console.time('mods-run')
+  console.time('page-displayed')
 })()

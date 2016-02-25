@@ -14,10 +14,12 @@ define([
   }
 
   available.load = function() {
+    console.time('available.load')
     var promise = engine.createDeferred()
     $.get(url).then(function(mods) {
       available.deserialize(mods)
       promise.resolve(available)
+      console.timeEnd('available.load')
     })
     return promise
   }

@@ -18,6 +18,7 @@ define([], function() {
   }
 
   var fetch = function(url, filename) {
+    console.time('fetch '+filename)
     if (!filename) {
       var parts = url.split('/')
       filename = parts[parts.length-1]
@@ -28,6 +29,9 @@ define([], function() {
       filename: filename,
       status: 'new',
     }
+    fileStatus[filename].promise.then(function() {
+      console.timeEnd('fetch '+filename)
+    })
     if (!starting) startNext()
     return fileStatus[filename].promise
   }
