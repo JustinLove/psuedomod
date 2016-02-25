@@ -1,6 +1,6 @@
 define(['pamm/file'], function(file) {
   var locateModinfo = function(zip, identifier) {
-      var infos = zip.file(/modinfo.json$/)
+      var infos = zip.file(/(^|\/)modinfo.json$/)
 
       if (infos.length < 1) {
         console.error('cannot fix zip with no modinfo.json')
@@ -9,8 +9,14 @@ define(['pamm/file'], function(file) {
         return infos[0]
       } else if (identifier) {
         infos = infos.filter(function(info) {
-          var modinfo = JSON.parse(info.asText());
-          return modinfo.identifier == identifier
+          try {
+            var modinfo = JSON.parse(info.asText());
+            return modinfo.identifier == identifier
+          } catch(e) {
+            console.error('invalid modinfo.json', info.name, identifier)
+            //console.log(info.asText())
+            return false
+          }
         })
         if (infos.length == 1) {
           return infos[0]
@@ -62,7 +68,10 @@ define(['pamm/file'], function(file) {
         reorganize(zip, basepath, identifier+'/')
         //console.log(zip)
       }
-      return file.zip.write(zip, target).then(function() {console.timeEnd('fix '+identifier)})
+      return file.zip.write(zip, target).then(function(status) {
+        console.timeEnd('fix '+identifier)
+        return status
+      })
     })
   }
 

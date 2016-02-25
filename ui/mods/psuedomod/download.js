@@ -29,8 +29,9 @@ define([], function() {
       filename: filename,
       status: 'new',
     }
-    fileStatus[filename].promise.then(function() {
+    fileStatus[filename].promise.then(function(result) {
       console.timeEnd('fetch '+filename)
+      return result
     })
     if (!starting) startNext()
     return fileStatus[filename].promise
@@ -78,6 +79,11 @@ define([], function() {
         }
       } else if (status.state == 'activated' || status.state == 'downloading') {
         info.status = status.state
+      } else if (status.state == 'failed') {
+        console.error('download failed', status.source, status.file)
+        console.warn(status)
+        info.promise.reject(status)
+        delete fileStatus[status.file]
       } else {
         console.error('unhandled download state ' + status.state)
         console.warn(status)

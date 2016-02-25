@@ -10,7 +10,7 @@ define([
   var available = new ModSet()
 
   available.refresh = function() {
-    download.fetch(registryUrl, 'available_mods.json').then(available.load)
+    return download.fetch(registryUrl, 'available_mods.json').then(available.load)
   }
 
   available.load = function() {
@@ -20,6 +20,7 @@ define([
       available.deserialize(mods)
       promise.resolve(available)
       console.timeEnd('available.load')
+      return mods
     })
     return promise
   }

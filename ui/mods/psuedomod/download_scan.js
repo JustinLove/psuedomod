@@ -11,23 +11,33 @@ define(['pamm/file'], function(file) {
   Scan.prototype.addModinfo = function(path, file) {
     //console.log('addmodinfo', path, file)
     var my = this
-    var info = JSON.parse(file.asText())
-    info.zipPath = path
-    if (info.scenes) {
-      _.each(info.scenes, function(value, key) {
-        info.scenes[key] = value.map(function(path) {
-          return path.toLowerCase()
+    try {
+      var info = JSON.parse(file.asText())
+      info.zipPath = path
+      if (info.scenes) {
+        _.each(info.scenes, function(value, key) {
+          info.scenes[key] = value.map(function(path) {
+            return path.toLowerCase()
+          })
         })
-      })
+      }
+      my.mods.push(info)
+      //console.log(info.identifier)
+    } catch(e) {
+      console.error('failed to parse modinfo in', path, file.name)
+      //console.log(file.asText())
     }
-    my.mods.push(info)
-    //console.log(info.identifier)
   }
 
   Scan.prototype.loadEnabledMods = function(file) {
     var my = this
-    var mods = JSON.parse(file.asText())
-    my.enabled = my.enabled.concat(mods.mount_order)
+    try {
+      var mods = JSON.parse(file.asText())
+      my.enabled = my.enabled.concat(mods.mount_order)
+    } catch(e) {
+      console.error('failed to parse mods.json', file.name)
+      //console.log(file.asText())
+    }
   }
 
   Scan.prototype.registerMods = function(paths) {

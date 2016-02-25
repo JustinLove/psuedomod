@@ -10,10 +10,13 @@ define([
 
   ModSet.prototype.setInstall = function() {
     return join(this.map(function(mod) {
-      return install.install(mod).then(function setInstall_installed(zip) {
-        mod.zipPath = '/download/'+zip.file;
+      return install.install(mod).then(function setInstall_installed(status) {
+        console.log('installed', status)
+        mod.zipPath = '/download/'+status.file;
         mod.installed = true
         installed.push(mod);
+      }, function setInstall_failed(status) {
+        console.log('install failed', status)
       })
     }))
   }
@@ -38,7 +41,10 @@ define([
     console.time('pamm.load')
     return local_state.load().then(function(state) {
       installed.deserialize(state.mods)
-      return pamm.write().then(function() {console.timeEnd('pamm.load')})
+      return pamm.write().then(function(result) {
+        console.timeEnd('pamm.load')
+        return result
+      })
     })
   }
 
@@ -52,7 +58,10 @@ define([
         }
       })
       installed.deserialize(state.mods)
-      return pamm.write().then(function() {console.timeEnd('pamm.refresh')})
+      return pamm.write().then(function(result) {
+        console.timeEnd('pamm.refresh')
+        return result
+      })
     })
   }
 
@@ -90,6 +99,23 @@ define([
   pamm.engineEnabled = function() {
     pamm.contextEnabled('client')
     pamm.contextEnabled('server')
+  }
+
+  pamm.stressTest = function(start, n) {
+    pamm.available.load().then(function() {
+      start = start || 0
+      n = n || 1
+      var work = pamm.available.serialize().slice(start, start+n)
+      console.log(work)
+      var nextMod = function() {
+        var mod = work.pop()
+        console.log('nextmod', mod)
+        if (mod) {
+          new ModSet([mod]).setInstall().always(nextMod)
+        }
+      }
+      nextMod()
+    })
   }
 
   return pamm
