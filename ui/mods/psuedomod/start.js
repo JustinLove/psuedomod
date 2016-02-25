@@ -3,7 +3,7 @@
 
   var config = require.s.contexts._.config
   config.waitSeconds = 0
-  config.paths.pamm = 'coui://client_mods/wPAMM/ui/mods/wPAMM'
+  config.paths.pamm = 'coui://client_mods/psuedomod/ui/mods/psuedomod'
 
   // model.uiOptions is not yet loaded
 })()
@@ -12,7 +12,7 @@ console.timeEnd('mods-run')
 
 require([
   'pamm/pamm'
-], function wPAMM_start(pamm) {
+], function psuedomod_start(pamm) {
   "use strict";
 
   api.pamm = pamm

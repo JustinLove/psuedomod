@@ -11,16 +11,16 @@
   "priority": 0,
   "scenes": {
     "global_mod_list": [
-      "coui://ui/mods/wPAMM/permazip.js"
+      "coui://ui/mods/psuedomod/permazip.js"
     ],
     "start": [
-      "coui://ui/mods/wPAMM/start.js"
+      "coui://ui/mods/psuedomod/start.js"
     ],
     "mods": [
-      "coui://ui/mods/wPAMM/start.js"
+      "coui://ui/mods/psuedomod/start.js"
     ],
     "settings": [
-      "coui://ui/mods/wPAMM/settings.js"
+      "coui://ui/mods/psuedomod/settings.js"
     ]
   },
   "signature": "not yet implemented",
