@@ -26,7 +26,10 @@ define(['pamm/download', 'pamm/lib/jszip'], function(download, JSZip) {
     var blob = zip.generate({type: 'blob'})
     console.timeEnd('generate '+filename)
     var url = window.URL.createObjectURL(blob)
-    return download.fetch(url, filename)
+    return download.fetch(url, filename).always(function(status) {
+      window.URL.revokeObjectURL(url)
+      return status
+    })
   }
 
   var loadBinary = function(url, type) {

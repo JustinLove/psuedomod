@@ -11,7 +11,6 @@ define([
   ModSet.prototype.setInstall = function() {
     return join(this.map(function(mod) {
       return install.install(mod).then(function setInstall_installed(status) {
-        console.log('installed', status)
         mod.zipPath = '/download/'+status.file;
         mod.installed = true
         installed.push(mod);
@@ -106,10 +105,9 @@ define([
       start = start || 0
       n = n || 1
       var work = pamm.available.serialize().slice(start, start+n)
-      console.log(work)
       var nextMod = function() {
         var mod = work.pop()
-        console.log('nextmod', mod)
+        console.log('nextmod', mod && mod.url)
         if (mod) {
           new ModSet([mod]).setInstall().always(nextMod)
         }
