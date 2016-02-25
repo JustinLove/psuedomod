@@ -50,7 +50,7 @@ define(['pamm/download', 'pamm/lib/jszip'], function(download, JSZip) {
   }
 
   var readZip = function(url) {
-    return loadBinary(url).then(function(stuff) {
+    return loadBinary(url).then(function readZip_convertToJSZip(stuff) {
       try {
         return new JSZip(stuff)
       } catch(e) {

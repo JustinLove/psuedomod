@@ -11,7 +11,7 @@ define([
     }
     var cache = 'cache-'+mod.identifier + '_v' + mod.version + '.zip'
     var target = mod.identifier + '.zip'
-    return api.download.list().then(function(downloads) {
+    return api.download.list().then(function install_download_list(downloads) {
       if (downloads.indexOf(cache) == -1) {
         return download.fetch(mod.url, cache).then(function(status) {
           return fix_paths(status.file, target, mod.identifier)

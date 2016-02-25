@@ -48,7 +48,7 @@ define(['pamm/file'], function(file) {
   }
 
   var fix = function(source, target, identifier) {
-    return file.zip.read('coui://download/'+source).then(function(zip) {
+    return file.zip.read('coui://download/'+source).then(function fix_paths_read_zip(zip) {
       //console.log(zip)
 
       var info = locateModinfo(zip, identifier)
