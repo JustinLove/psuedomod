@@ -36,10 +36,8 @@ define([
     console.time('pamm.load')
     return local_state.load().then(function(state) {
       installed.deserialize(state.mods)
-      return pamm.write().then(function(result) {
-        console.timeEnd('pamm.load')
-        return result
-      })
+      console.timeEnd('pamm.load')
+      return installed
     })
   }
 
