@@ -6,8 +6,11 @@ define([
 
   var Context = function(mods, context, path) {
     this.context = context
-    this.path = path
     this.identifier = 'com.wondible.pa.pamm.' + context
+    this.myPath = this.identifier
+    this.collectionPath = path
+    this.mountPoint = path
+    this.modsPath = ''
     this.mods = mods.sort()
     this.mounts = {}
   }
@@ -32,8 +35,8 @@ define([
     console.log(my.context, 'mods', 'enabled', my.mods.length)
     var files = pammMod(my)
     return file.zip.create(files, my.identifier+'.zip').then(function(status) {
-      my.mounts = my.mods.getMounts(my.path)
-      my.mounts['/download/' + status.file] = my.path
+      my.mounts = my.mods.getMounts(my.collectionPath)
+      my.mounts['/download/' + status.file] = my.mountPoint
       return my
     }, function(err) {
       console.log('zip failed', err)

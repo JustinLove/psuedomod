@@ -62,10 +62,11 @@ define(['pamm/file'], function(file) {
       if (!info) return false
 
       var basepath = info.name.match(/^(.*)modinfo.json$/)[1]
+      var newpath = identifier+'/'
 
       if (basepath && basepath != '') {
-        console.info(source, 'rename', basepath, '->', identifier)
-        reorganize(zip, basepath, identifier+'/')
+        console.info(source, 'rename', basepath, '->', newpath)
+        reorganize(zip, basepath, newpath)
         //console.log(zip)
       }
       return file.zip.write(zip, target).then(function(status) {

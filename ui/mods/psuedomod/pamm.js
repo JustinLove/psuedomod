@@ -110,5 +110,17 @@ define([
     })
   }
 
+  pamm.reinstallAll = function() {
+    installed.load().then(function() {
+      var reinstallable = installed.zip()
+      console.log(reinstallable.getIdentifiers())
+      reinstallable.setUninstall().then(function() {
+        available.load().then(function() {
+          available.find(reinstallable.getIdentifiers()).withDependencies().setInstall()
+        })
+      })
+    })
+  }
+
   return pamm
 })

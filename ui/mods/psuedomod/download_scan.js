@@ -65,7 +65,8 @@ define(['pamm/file'], function(file) {
           }
         }
 
-        var infos = zip.file(/^\/?[^/]+\/modinfo.json$/)
+        var infos = zip.file(/^\/?([^/]+\/)?modinfo.json$/)
+        //var infos = zip.file(/^\/?[^/]+\/modinfo.json$/)
         if (infos.length == 1) {
           my.addModinfo('/download/' + item, infos[0])
           my.resolve()

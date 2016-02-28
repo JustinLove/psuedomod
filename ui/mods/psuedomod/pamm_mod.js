@@ -3,7 +3,7 @@ define([], function() {
 
   var mod = function(collection) {
     var files = {}
-    var path = collection.identifier
+    var path = collection.myPath
     files[path + '/modinfo.json'] = modinfo(collection)
     var ui = ui_mod_list(collection)
     files[path + '/ui/mods/ui_mod_list.js'] = ui
@@ -13,7 +13,7 @@ define([], function() {
     if (collection.context != 'server') {
       files[path + '/ui/mods/ui_mod_list_for_server.js'] = ui
     }
-    files['mods.json'] = mods(collection)
+    files[collection.modsPath+'mods.json'] = mods(collection)
     return files
   }
 
