@@ -26,7 +26,12 @@ define([
       if (state) {
         return state
       } else {
-        return refresh()
+        return refresh().then(function(state) {
+          save(state)
+          return api.file.permazip.mount('refresh restore').then(function() {
+            return state
+          })
+        })
       }
     }, function(err) {
       console.log('memory fail?', err)

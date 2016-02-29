@@ -4,6 +4,7 @@
   var pz = api.file.permazip = {}
   pz.mounts = ko.observable({}).extend({local: 'com.wondible.pa.pamm.mounts'})
   pz.mount = function permazip_mount(reason) {
+    var promise = engine.createDeferred()
     var loadMods = api.settings.isSet('ui', 'pamm_load_mods', true) || 'LOAD'
     if (loadMods == 'OFF') return
     console.time('mount')
@@ -16,13 +17,18 @@
         count--
         if (count < 1) {
           console.time('remount')
-          engine.call('content.mountUntilReset', api.content.active()).then(function() {console.timeEnd('remount')})
-          //api.content.remount().then(function() {console.timeEnd('remount')})
+          engine.call('content.mountUntilReset', api.content.active())
+          //api.content.remount()
+            .then(function() {
+              promise.resolve()
+              console.timeEnd('remount')
+            })
           console.timeEnd('mount')
           console.log('permazip mounted ' + total.toString() + ': ' + reason)
         }
       })
     })
+    return promise
   }
 
   pz.unmountAllMemoryFiles = api.file.unmountAllMemoryFiles
