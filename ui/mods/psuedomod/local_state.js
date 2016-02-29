@@ -21,10 +21,10 @@ define([
   }
 
   var load = function() {
-    return api.memory.load(key).then(function(string) {
-      //string = null
-      if (string) {
-        return string
+    return api.memory.load(key).then(function(state) {
+      //state = null
+      if (state) {
+        return state
       } else {
         return refresh()
       }
