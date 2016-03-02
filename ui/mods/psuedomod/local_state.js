@@ -50,42 +50,29 @@ define([
       enabled: [],
     }
 
+    var register = function(contexts, label) {
+      return function(scan) {
+        console.log(label, 'found', scan.mods.length, 'enabled', scan.enabled.length)
+        state.enabled = state.enabled.concat(scan.enabled)
+        scan.mods.forEach(function(info) {
+          if (contexts.indexOf(info.context) != -1) {
+            state.mods.push(info)
+          } else {
+            console.error(info.identifier, info.zipPath || info.installedPath, 'unknown mod context', info.context)
+          }
+        })
+      }
+    }
+
     return join([
-      new FilesystemScan().scan('/client_mods/').then(function(scan) {
-        console.log('client found', scan.mods.length, 'enabled', scan.enabled.length)
-        state.enabled = state.enabled.concat(scan.enabled)
-        scan.mods.forEach(function(info) {
-          if (info.context == 'client') {
-            state.mods.push(info)
-          } else {
-            console.error(info.identifier, info.zipPath || info.installedPath, 'unknown mod context', info.context)
-          }
-        })
-      }),
-      new FilesystemScan().scan('/server_mods/').then(function(scan) {
-        console.log('server found', scan.mods.length, 'enabled', scan.enabled.length)
-        state.enabled = state.enabled.concat(scan.enabled)
-        scan.mods.forEach(function(info) {
-          if (info.context == 'server') {
-            state.mods.push(info)
-          } else {
-            console.error(info.identifier, info.zipPath || info.installedPath, 'unknown mod context', info.context)
-          }
-        })
-      }),
-      new DownloadScan().scan().then(function(scan) {
-        console.log('download found', scan.mods.length, 'enabled', scan.enabled.length)
-        state.enabled = state.enabled.concat(scan.enabled)
-        scan.mods.forEach(function(info) {
-          if (info.context == 'client') {
-            state.mods.push(info)
-          } else if (info.context == 'server') {
-            state.mods.push(info)
-          } else {
-            console.error(info.identifier, info.zipPath || info.installedPath, 'unknown mod context', info.context)
-          }
-        })
-      }),
+      new FilesystemScan().scan('/client_mods/')
+        .then(register(['client'], 'client')),
+      new FilesystemScan().scan('/server_mods/')
+        .then(register(['server'], 'server')),
+      new FilesystemScan().scan('/stockmods/server/')
+        .then(register(['server'], 'stock/server')),
+      new DownloadScan().scan()
+        .then(register(['client', 'server'], 'download')),
     ]).then(function() {
       state.mods = state.mods.filter(function(mod) {
         return exclude.indexOf(mod.identifier) == -1
