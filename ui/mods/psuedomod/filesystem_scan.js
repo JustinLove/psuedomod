@@ -33,7 +33,7 @@ define(['pamm/unit_list'], function(unitList) {
       }
       for (var i in pa) {
         if (pa[i].match(/unit_list.json$/)) {
-          console.log(path, 'found unit list')
+          //console.log(path, 'found unit list')
           my.loadUnitList(pa[i], info)
           my.resolve()
           return

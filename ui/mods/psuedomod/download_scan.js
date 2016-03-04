@@ -1,4 +1,4 @@
-define(['pamm/file'], function(file) {
+define(['pamm/file', 'pamm/unit_list'], function(file, unitList) {
   "use strict";
 
   var Scan = function() {
@@ -23,9 +23,36 @@ define(['pamm/file'], function(file) {
       }
       my.mods.push(info)
       //console.log(info.identifier)
+      return info
     } catch(e) {
       console.error('failed to parse modinfo in', path, file.name)
       //console.log(file.asText())
+    }
+  }
+
+  Scan.prototype.loadUnitList = function(file, info) {
+    var my = this
+    try {
+      var list = JSON.parse(file.asText())
+      my.pending++
+      unitList.load().then(function(master) {
+        info.unit_list = my.diffUnitList(list, master)
+        //console.log(file.name, info.unit_list)
+        my.resolve()
+      }, function(err) {
+        console.error(path, 'master unit list could not be loaded')
+        my.reject(err)
+      })
+    } catch(e) {
+      console.error('failed to parse unit_list in', file.name)
+      //console.log(file.asText())
+    }
+  }
+
+  Scan.prototype.diffUnitList = function(list, master) {
+    return {
+      add_units: _.difference(list.units, master.units),
+      remove_units: _.difference(master.units, list.units),
     }
   }
 
@@ -65,10 +92,20 @@ define(['pamm/file'], function(file) {
           }
         }
 
+        var unitLists = zip.file(/unit_list.json$/)
+        var unit_list
+        if (unitLists.length == 1) {
+          unitList.load()
+          unit_list = unitLists[0]
+        }
+
         var infos = zip.file(/^\/?([^/]+\/)?modinfo.json$/)
         //var infos = zip.file(/^\/?[^/]+\/modinfo.json$/)
         if (infos.length == 1) {
-          my.addModinfo('/download/' + item, infos[0])
+          var info = my.addModinfo('/download/' + item, infos[0])
+          if (unit_list && !info.unit_list) {
+            my.loadUnitList(unit_list, info)
+          }
           my.resolve()
           return
         }

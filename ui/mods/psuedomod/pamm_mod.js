@@ -22,13 +22,13 @@ define(['pamm/unit_list'], function(unitList) {
 
     var changes = unitChanges(collection)
     if (changes.add_units.length > 0 || changes.remove_units.length > 0) {
-      console.log('changes', changes)
-      console.log(unitList)
+      console.log('unit list changes +', changes.add_units.length, -changes.remove_units.length)
+      //console.log(unitList)
       unitList.load().then(function(list) {
-        console.log('got units', list)
+        //console.log('got units', list)
         files[path+'/pa/units/unit_list.json'] = unit_list(list, changes)
       }).always(function() {
-        console.log('resolve')
+        //console.log('resolve')
         promise.resolve(files)
       })
     } else {
@@ -111,7 +111,7 @@ define(['pamm/unit_list'], function(unitList) {
   var unit_list = function(list, changes) {
     list.units = _.difference(list.units, changes.remove_units);
     list.units = _.union(list.units, changes.add_units);
-    console.log(list.units)
+    console.log('created unit list', list.units.length)
     return JSON.stringify(list);
   }
 
