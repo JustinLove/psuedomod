@@ -6,6 +6,7 @@ define([], function() {
       var local = engine.createDeferred()
       promise = local
       $.get('coui://pa/units/unit_list.json').then(function(units) {
+        units.units = _.uniq(units.units)
         local.resolve(units)
       }, function(err) {
         console.error('fetch unit list failed')
