@@ -53,6 +53,14 @@ define(['pamm/file'], function(file) {
     })
   }
 
+  var compareSize = function(source, status, identifier) {
+    $.get('coui://download/'+source+'.dlmeta').then(function(sourcestatus) {
+      sourcestatus = JSON.parse(sourcestatus)
+      window.sizes = window.sizes || {}
+      console.log(window.sizes[identifier] = [sourcestatus.size, status.size, status.size / (sourcestatus.size || 1)])
+    })
+  }
+
   var fix = function(source, target, identifier) {
     console.time('fix '+identifier)
     return file.zip.read('coui://download/'+source).then(function fix_paths_read_zip(zip) {
@@ -70,13 +78,7 @@ define(['pamm/file'], function(file) {
         //console.log(zip)
       }
       return file.zip.write(zip, target).then(function(status) {
-        /*
-        $.get('coui://download/'+source+'.dlmeta').then(function(sourcestatus) {
-          sourcestatus = JSON.parse(sourcestatus)
-          window.sizes = window.sizes || {}
-          console.log(window.sizes[identifier] = [sourcestatus.size, status.size, status.size / (sourcestatus.size || 1)])
-        })
-        */
+        //compareSize(source, status, identifier)
         console.timeEnd('fix '+identifier)
         return status
       })
