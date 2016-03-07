@@ -80,7 +80,7 @@ define(['pamm/file'], function(file) {
       return file.zip.write(zip, target).then(function(status) {
         //compareSize(source, status, identifier)
         console.timeEnd('fix '+identifier)
-        return status
+        return [status, zip]
       })
     })
   }

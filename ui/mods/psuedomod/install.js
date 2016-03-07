@@ -1,7 +1,8 @@
 define([
   'pamm/download',
   'pamm/fix_paths',
-], function(download, fix_paths) {
+  'pamm/download_scan',
+], function(download, fix_paths, DownloadScan) {
   "use strict";
 
   var install = function(mod) {
@@ -19,12 +20,20 @@ define([
       } else {
         return fix_paths(cache, target, mod.identifier)
       }
-    }).then(function install_touchup(status) {
-      mod.zipPath = '/download/'+status.file;
-      mod.installed = true
-      return status
-    }, function install_failed(status) {
-      return status
+    }).then(function install_touchup(statusAndZip) {
+      var status = statusAndZip[0]
+      var zip = statusAndZip[1]
+      return new DownloadScan().examineZip(status.file, zip).then(function(scan) {
+        if (scan.mods.length == 1) {
+          _.assign(mod, scan.mods[0])
+          mod.installed = true
+        } else {
+          console.warn(status.file, 'does not seem to contain one mod')
+        }
+        return status
+      })
+    }, function install_failed(err) {
+      return err
     })
   }
 

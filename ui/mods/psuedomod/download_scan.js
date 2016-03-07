@@ -67,6 +67,53 @@ define(['pamm/file', 'pamm/unit_list'], function(file, unitList) {
     }
   }
 
+  Scan.prototype.examineZip = function(filename, zip) {
+    //console.log(filename, zip)
+
+    var my = this
+    var mods = zip.file('mods.json')
+    if (mods) {
+      my.loadEnabledMods(mods)
+    } else {
+      mods = zip.file(/mods.json$/)
+      if (mods.length > 0) {
+        console.warn(filename, mods.length, 'possible misplaced mods.json')
+        mods.forEach(function(file) {console.log('', file.name)})
+      }
+    }
+
+    var unitLists = zip.file(/unit_list.json$/)
+    var unit_list
+    if (unitLists.length == 1) {
+      unitList.load()
+      unit_list = unitLists[0]
+    }
+
+    var infos = zip.file(/^\/?([^/]+\/)?modinfo.json$/)
+    //var infos = zip.file(/^\/?[^/]+\/modinfo.json$/)
+    if (infos.length == 1) {
+      var info = my.addModinfo('/download/' + filename, infos[0])
+      if (unit_list && !info.unit_list) {
+        my.loadUnitList(unit_list, info)
+      }
+      return my.promise
+    }
+    infos = zip.file(/modinfo.json$/)
+    if (infos.length > 0) {
+      console.warn(filename, infos.length, 'possible misplaced modinfo')
+      infos.forEach(function(file) {console.log('', file.name)})
+    } else {
+      console.warn(filename, 'had no modinfo')
+    }
+
+    // if we loaded it ourselves as part of a scan, should still be at least one pending
+    if (my.pending < 1) {
+      my.promise.reject()
+    }
+
+    return my.promise
+  }
+
   Scan.prototype.registerMods = function(downloads) {
     var my = this
     downloads.forEach(function(item) {
@@ -79,44 +126,7 @@ define(['pamm/file', 'pamm/unit_list'], function(file, unitList) {
       }
       my.pending++
       file.zip.read('coui://download/'+item).then(function(zip) {
-        //console.log(item, zip)
-
-        var mods = zip.file('mods.json')
-        if (mods) {
-          my.loadEnabledMods(mods)
-        } else {
-          mods = zip.file(/mods.json$/)
-          if (mods.length > 0) {
-            console.warn(item, mods.length, 'possible misplaced mods.json')
-            mods.forEach(function(file) {console.log('', file.name)})
-          }
-        }
-
-        var unitLists = zip.file(/unit_list.json$/)
-        var unit_list
-        if (unitLists.length == 1) {
-          unitList.load()
-          unit_list = unitLists[0]
-        }
-
-        var infos = zip.file(/^\/?([^/]+\/)?modinfo.json$/)
-        //var infos = zip.file(/^\/?[^/]+\/modinfo.json$/)
-        if (infos.length == 1) {
-          var info = my.addModinfo('/download/' + item, infos[0])
-          if (unit_list && !info.unit_list) {
-            my.loadUnitList(unit_list, info)
-          }
-          my.resolve()
-          return
-        }
-        infos = zip.file(/modinfo.json$/)
-        if (infos.length > 0) {
-          console.warn(item, infos.length, 'possible misplaced modinfo')
-          infos.forEach(function(file) {console.log('', file.name)})
-        } else {
-          console.warn(item, 'had no modinfo')
-        }
-
+        my.examineZip(item, zip)
         my.resolve()
       }, function(err) {
         console.warn(item, 'could not be listed', err)
