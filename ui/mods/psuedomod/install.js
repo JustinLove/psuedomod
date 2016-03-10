@@ -2,7 +2,8 @@ define([
   'pamm/download',
   'pamm/fix_paths',
   'pamm/download_scan',
-], function(download, fix_paths, DownloadScan) {
+  'pamm/promise',
+], function(download, fix_paths, DownloadScan, Promise) {
   "use strict";
 
   var install = function(mod) {
@@ -12,9 +13,10 @@ define([
     }
     var cache = 'cache-'+mod.identifier + '_v' + mod.version + '.zip'
     var target = mod.identifier + '.zip'
-    return api.download.list().then(function install_download_list(downloads) {
+    return Promise.wrap(api.download.list())
+                  .then(function install_download_list(downloads) {
       if (downloads.indexOf(cache) == -1) {
-        return download.fetch(mod.url, cache).then(function(status) {
+        return download.save(mod.url, cache).then(function(status) {
           return fix_paths(status.file, target, mod.identifier)
         })
       } else {
@@ -33,6 +35,7 @@ define([
         return status
       })
     }, function install_failed(err) {
+      console.log('install failed', err)
       return err
     })
   }
@@ -45,7 +48,7 @@ define([
     var downloadItem = mod.zipPath.replace('/download/', '') 
     delete mod.zipPath
     mod.installed = false
-    return api.download.delete(downloadItem)
+    return Promise.wrap(api.download.delete(downloadItem))
   }
 
   return {

@@ -1,4 +1,4 @@
-define([], function() {
+define(['pamm/promise'], function(Promise) {
   "use strict";
 
   var File = function(path) {
@@ -7,7 +7,7 @@ define([], function() {
 
   File.prototype.asText = function() {
     var my = this
-    var promise = engine.createDeferred()
+    var promise = new Promise()
     if (my.text) {
       promise.resolve(my.text)
       return promise
@@ -24,7 +24,7 @@ define([], function() {
 
   File.prototype.asJson = function() {
     var my = this
-    var promise = engine.createDeferred()
+    var promise = new Promise()
     if (my.obj) {
       promise.resolve(my.obj)
       return promise

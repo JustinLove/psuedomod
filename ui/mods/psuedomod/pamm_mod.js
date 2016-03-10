@@ -1,8 +1,8 @@
-define(['pamm/unit_list'], function(unitList) {
+define(['pamm/unit_list', 'pamm/promise'], function(unitList, Promise) {
   "use strict";
 
   var mod = function(collection) {
-    var promise = engine.createDeferred()
+    var promise = new Promise()
     var files = {}
 
     files[collection.modsPath+'mods.json'] = mods(collection)

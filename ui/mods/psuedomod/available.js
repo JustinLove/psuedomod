@@ -10,19 +10,16 @@ define([
   var available = new ModSet()
 
   available.refresh = function() {
-    return download.fetch(registryUrl, 'available_mods.json').then(available.load)
+    return download.save(registryUrl, 'available_mods.json').then(available.load)
   }
 
   available.load = function() {
     console.time('available.load')
-    var promise = engine.createDeferred()
-    $.get(url).then(function(mods) {
+    return download.fetch(url).then(function(mods) {
       available.deserialize(mods)
-      promise.resolve(available)
       console.timeEnd('available.load')
-      return mods
+      return available
     })
-    return promise
   }
 
   return available

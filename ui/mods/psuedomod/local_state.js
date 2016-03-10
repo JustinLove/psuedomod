@@ -1,8 +1,8 @@
 define([
-  'pamm/coherent_join',
   'pamm/filesystem_scan',
   'pamm/download_scan',
-], function(join, FilesystemScan, DownloadScan) {
+  'pamm/promise',
+], function(FilesystemScan, DownloadScan, Promise) {
   "use strict";
 
   var exclude = [
@@ -17,20 +17,19 @@ define([
 
   var save = function(state) {
     state.restored = true
-    return api.memory.store(key, state)
+    return Promise.wrap(api.memory.store(key, state))
   }
 
   var load = function() {
-    return api.memory.load(key).then(function(state) {
+    return Promise.wrap(api.memory.load(key)).then(function(state) {
       //state = null
       if (state) {
         return state
       } else {
         return refresh().then(function(state) {
           save(state)
-          return api.file.permazip.mount('refresh restore').then(function() {
-            return state
-          })
+          Promise.wrap(api.file.permazip.mount('refresh restore'))
+            .then(function() { return state })
         })
       }
     }, function(err) {
@@ -64,7 +63,7 @@ define([
       }
     }
 
-    return join([
+    return Promise.all([
       new FilesystemScan().scan('/client_mods/')
         .then(register(['client'], 'client')),
       new FilesystemScan().scan('/server_mods/')

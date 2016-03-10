@@ -17,8 +17,10 @@ define(['pamm/unit_list'], function(unitList) {
               info.unit_list = diffUnitList(list, master)
               //console.log(info.identifier)
               //console.log(info.unit_list)
+              return info
             }, function(err) {
               console.error(path, 'master unit list could not be loaded')
+              return err
             })
           })
         }

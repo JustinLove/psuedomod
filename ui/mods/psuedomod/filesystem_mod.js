@@ -1,4 +1,4 @@
-define(['pamm/filesystem_object'], function(File) {
+define(['pamm/filesystem_object', 'pamm/promise'], function(File, Promise) {
   "use strict";
 
   var Mod = function(root, info /*opt*/) {
@@ -10,7 +10,7 @@ define(['pamm/filesystem_object'], function(File) {
 
   Mod.prototype.file = function(path) {
     var my = this
-    var promise = engine.createDeferred()
+    var promise = new Promise()
     path = path.replace(/^\//, '')
     var match = path.match(/(^.*\/)?[^\/]+$/)
     if (match) {
@@ -34,9 +34,7 @@ define(['pamm/filesystem_object'], function(File) {
   Mod.prototype.modinfo = function() {
     var my = this
     if (my.info) {
-      var promise = engine.createDeferred()
-      promise.resolve(my.info)
-      return promise
+      return new Promise.resolve(info)
     }
     if (my.infoPromise) {
       return my.infoPromise
@@ -60,15 +58,15 @@ define(['pamm/filesystem_object'], function(File) {
   }
 
   var list = function(root, recurse) {
-    return engine.call('file.list', String(root), !!recurse).then(function(files) {
+    var promise = new Promise()
+    engine.call('file.list', String(root), !!recurse).then(function(files) {
       if (files && files !== '') {
-        return JSON.parse(files);
+        promise.resolve(JSON.parse(files))
       } else {
-        var promise = engine.createDeferred();
-        promise.reject(root + ' is not listable');
-        return promise;
+        promise.reject(root + ' is not listable')
       }
     });
+    return promise
   }
 
   return Mod

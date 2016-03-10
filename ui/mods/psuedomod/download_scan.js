@@ -1,11 +1,15 @@
-define(['pamm/file', 'pamm/unit_list'], function(file, unitList) {
+define([
+  'pamm/file',
+  'pamm/promise',
+  'pamm/unit_list'
+], function(file, Promise, unitList) {
   "use strict";
 
   var Scan = function() {
     this.mods = []
     this.enabled = []
     this.pending = 0
-    this.promise = engine.createDeferred()
+    this.promise = new Promise()
   }
 
   Scan.prototype.addModinfo = function(path, file) {
@@ -95,6 +99,10 @@ define(['pamm/file', 'pamm/unit_list'], function(file, unitList) {
       var info = my.addModinfo('/download/' + filename, infos[0])
       if (unit_list && !info.unit_list) {
         my.loadUnitList(unit_list, info)
+      }
+      // if we loaded it ourselves as part of a scan, should still be at least one pending
+      if (my.pending < 1) {
+        my.promise.resolve(my)
       }
       return my.promise
     }

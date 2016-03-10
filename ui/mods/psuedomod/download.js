@@ -1,4 +1,4 @@
-define([], function() {
+define(['pamm/promise'], function(Promise) {
   "use strict";
 
   var fileStatus = {}
@@ -17,20 +17,20 @@ define([], function() {
     }
   }
 
-  var fetch = function(url, filename) {
-    console.time('fetch '+filename)
+  var save = function(url, filename) {
+    console.time('save '+filename)
     if (!filename) {
       var parts = url.split('/')
       filename = parts[parts.length-1]
     }
     fileStatus[filename] = {
-      promise: engine.createDeferred(),
+      promise: new Promise(),
       url: url,
       filename: filename,
       status: 'new',
     }
     fileStatus[filename].promise.then(function(result) {
-      console.timeEnd('fetch '+filename)
+      console.timeEnd('save '+filename)
       return result
     })
     if (!starting) startNext()
@@ -93,7 +93,12 @@ define([], function() {
     }
   }
 
+  var fetch = function(url) {
+    return Promise.wrap($.get(url))
+  }
+
   return {
     fetch: fetch,
+    save: save,
   }
 })

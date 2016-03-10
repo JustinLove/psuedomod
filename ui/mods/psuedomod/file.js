@@ -1,4 +1,8 @@
-define(['pamm/download', 'pamm/lib/jszip'], function(download, JSZip) {
+define([
+  'pamm/download',
+  'pamm/promise',
+  'pamm/lib/jszip'
+], function(download, Promise, JSZip) {
   "use strict";
 
   var mountZippedFiles = function(files, filename, root) {
@@ -26,7 +30,7 @@ define(['pamm/download', 'pamm/lib/jszip'], function(download, JSZip) {
     var blob = zip.generate({type: 'blob', compression: 'DEFLATE'})
     console.timeEnd('generate '+filename)
     var url = window.URL.createObjectURL(blob)
-    return download.fetch(url, filename).always(function(status) {
+    return download.save(url, filename).always(function(status) {
       window.URL.revokeObjectURL(url)
       return status
     })
@@ -38,7 +42,7 @@ define(['pamm/download', 'pamm/lib/jszip'], function(download, JSZip) {
     xhr.responseType = type || 'arraybuffer'
     //xhr.setRequestHeader('Pragma', 'no-cache')
     //xhr.setRequestHeader('Cache-Control', 'no-cache')
-    var promise = engine.createDeferred()
+    var promise = new Promise()
 
     xhr.onload = function () {
       if (this.status === 200) {

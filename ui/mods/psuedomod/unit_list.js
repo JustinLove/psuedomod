@@ -1,9 +1,9 @@
-define([], function() {
+define(['pamm/promise'], function(Promise) {
   var promise
 
   var unit_list = {
     refresh: function() {
-      var local = engine.createDeferred()
+      var local = new Promise()
       promise = local
       $.get('coui://pa/units/unit_list.json').then(function(units) {
         units.units = _.uniq(units.units)

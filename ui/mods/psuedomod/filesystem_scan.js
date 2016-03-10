@@ -1,11 +1,15 @@
-define(['pamm/filesystem_mod', 'pamm/infer_unit_list'], function(Mod, infer) {
+define([
+  'pamm/filesystem_mod',
+  'pamm/infer_unit_list',
+  'pamm/promise',
+], function(Mod, infer, Promise) {
   "use strict";
 
   var Scan = function() {
     this.mods = []
     this.enabled = []
     this.pending = 0
-    this.promise = engine.createDeferred()
+    this.promise = new Promise()
   }
 
   Scan.prototype.loadEnabledMods = function(path) {
