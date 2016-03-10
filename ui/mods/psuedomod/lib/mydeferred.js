@@ -19,7 +19,7 @@
 				try {
 					retVal = callback.apply(promise, args);
 				} catch (err) {
-          console.log(err, err.stack());
+					console.warn('error in promise handler', err, err.stack);
 					promise.reject(err);
 					return;
 				}

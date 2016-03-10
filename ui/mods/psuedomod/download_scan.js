@@ -1,8 +1,9 @@
 define([
+  'pamm/download_mod',
+  'pamm/infer_unit_list',
   'pamm/file',
   'pamm/promise',
-  'pamm/unit_list'
-], function(file, Promise, unitList) {
+], function(Mod, infer, file, Promise) {
   "use strict";
 
   var Scan = function() {
@@ -10,54 +11,6 @@ define([
     this.enabled = []
     this.pending = 0
     this.promise = new Promise()
-  }
-
-  Scan.prototype.addModinfo = function(path, file) {
-    //console.log('addmodinfo', path, file)
-    var my = this
-    try {
-      var info = JSON.parse(file.asText())
-      info.zipPath = path
-      if (info.scenes) {
-        _.each(info.scenes, function(value, key) {
-          info.scenes[key] = value.map(function(filename) {
-            return filename.toLowerCase()
-          })
-        })
-      }
-      my.mods.push(info)
-      //console.log(info.identifier)
-      return info
-    } catch(e) {
-      console.error('failed to parse modinfo in', path, file.name)
-      //console.log(file.asText())
-    }
-  }
-
-  Scan.prototype.loadUnitList = function(file, info) {
-    var my = this
-    try {
-      var list = JSON.parse(file.asText())
-      my.pending++
-      unitList.load().then(function(master) {
-        info.unit_list = my.diffUnitList(list, master)
-        //console.log(file.name, info.unit_list)
-        my.resolve()
-      }, function(err) {
-        console.error(path, 'master unit list could not be loaded')
-        my.reject(err)
-      })
-    } catch(e) {
-      console.error('failed to parse unit_list in', file.name)
-      //console.log(file.asText())
-    }
-  }
-
-  Scan.prototype.diffUnitList = function(list, master) {
-    return {
-      add_units: _.difference(list.units, master.units),
-      remove_units: _.difference(master.units, list.units),
-    }
   }
 
   Scan.prototype.loadEnabledMods = function(file) {
@@ -86,33 +39,16 @@ define([
       }
     }
 
-    var unitLists = zip.file(/unit_list.json$/)
-    var unit_list
-    if (unitLists.length == 1) {
-      unitList.load()
-      unit_list = unitLists[0]
-    }
-
-    var infos = zip.file(/^\/?([^/]+\/)?modinfo.json$/)
-    //var infos = zip.file(/^\/?[^/]+\/modinfo.json$/)
-    if (infos.length == 1) {
-      var info = my.addModinfo('/download/' + filename, infos[0])
-      if (unit_list && !info.unit_list) {
-        my.loadUnitList(unit_list, info)
-      }
-      // if we loaded it ourselves as part of a scan, should still be at least one pending
-      if (my.pending < 1) {
-        my.promise.resolve(my)
-      }
-      return my.promise
-    }
-    infos = zip.file(/modinfo.json$/)
-    if (infos.length > 0) {
-      console.warn(filename, infos.length, 'possible misplaced modinfo')
-      infos.forEach(function(file) {console.log('', file.name)})
-    } else {
-      console.warn(filename, 'had no modinfo')
-    }
+    var mod = new Mod(zip, filename)
+    my.pending++
+    mod.modinfo().then(function(info) {
+      my.mods.push(info)
+      infer(mod)
+      my.resolve()
+    }, function(err) {
+      //console.warn(filename, 'had no modinfo')
+      my.resolve()
+    })
 
     // if we loaded it ourselves as part of a scan, should still be at least one pending
     if (my.pending < 1) {
