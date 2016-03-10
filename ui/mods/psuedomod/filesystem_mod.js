@@ -15,19 +15,16 @@ define(['pamm/filesystem_object', 'pamm/promise'], function(File, Promise) {
     if (match) {
       var dir = my.path + (match[1] || '')
     } else {
-      promise.reject()
-      return promise
+      return Promise.reject()
     }
-    list(dir).then(function(paths) {
+    return list(dir).then(function(paths) {
       for (var i in paths) {
         if (paths[i] == my.path + path) {
-          promise.resolve(new File(paths[i]))
-          return
+          return new File(paths[i])
         }
       }
-      promise.reject()
+      return Promise.reject()
     })
-    return promise
   }
 
   Mod.prototype.modinfo = function() {

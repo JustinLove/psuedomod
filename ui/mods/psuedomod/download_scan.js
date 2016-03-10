@@ -43,8 +43,7 @@ define([
     my.pending++
     mod.modinfo().then(function(info) {
       my.mods.push(info)
-      infer(mod)
-      my.resolve()
+      infer(mod).always(function() {my.resolve()})
     }, function(err) {
       //console.warn(filename, 'had no modinfo')
       my.resolve()

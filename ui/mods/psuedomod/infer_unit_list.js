@@ -9,7 +9,7 @@ define(['pamm/unit_list'], function(unitList) {
   }
 
   var infer = function(mod) {
-    mod.file('pa/units/unit_list.json').then(function(file) {
+    return mod.file('pa/units/unit_list.json').then(function(file) {
       return file.asJson().then(function(list) {
         if (list && list.units) {
           return mod.modinfo().then(function(info) {
