@@ -1,10 +1,9 @@
 define(['pamm/filesystem_object', 'pamm/promise'], function(File, Promise) {
   "use strict";
 
-  var Mod = function(root, info /*opt*/) {
+  var Mod = function(root) {
     this.root = root
     this.path = root
-    this.info = info
     this.infoPromise
   }
 
@@ -33,16 +32,12 @@ define(['pamm/filesystem_object', 'pamm/promise'], function(File, Promise) {
 
   Mod.prototype.modinfo = function() {
     var my = this
-    if (my.info) {
-      return new Promise.resolve(info)
-    }
     if (my.infoPromise) {
       return my.infoPromise
     }
     my.infoPromise = my.file('modinfo.json').then(function(file) {
       return file.asJson().then(function(info) {
         info.installedPath = my.root
-        my.info = info
         //console.log(info.identifier)
         return info
       }, function(err) {
