@@ -1,7 +1,8 @@
 define([
   'pamm/pamm_mod',
-  'pamm/file'
-], function(pammMod, file) {
+  'pamm/file',
+  'pamm/promise',
+], function(pammMod, file, Promise) {
   "use strict";
 
   var Context = function(mods, context, path) {
@@ -30,10 +31,13 @@ define([
     return this.mods
   }
 
-  Context.prototype.write = function() {
+  Context.prototype.write = function(extensions) {
     var my = this
     console.log(my.context, 'mods', 'enabled', my.mods.length)
-    return pammMod(my).then(function(files) {
+    var files = pammMod(my)
+    return Promise.all((extensions||[]).map(function(ex) {
+      return ex(my, files)
+    })).then(function() {
       return file.zip.create(files, my.identifier+'.zip').then(function(status) {
         my.mounts = my.mods.getMounts(my.collectionPath)
         my.mounts['/download/' + status.file] = my.mountPoint

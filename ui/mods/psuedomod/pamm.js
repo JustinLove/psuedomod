@@ -5,8 +5,18 @@ define([
   'pamm/context',
   'pamm/local_state',
   'pamm/infer_unit_list',
+  'pamm/compose_unit_list',
   'pamm/promise',
-], function(available, install, ModSet, Context, local_state, infer_unit_list, Promise) {
+], function(
+  available,
+  install,
+  ModSet,
+  Context,
+  local_state,
+  infer_unit_list,
+  compose_unit_list,
+  Promise
+) {
   "use strict";
 
   ModSet.prototype.setInstall = function() {
@@ -36,7 +46,10 @@ define([
   pamm.extensions = {
     scan: [
       infer_unit_list,
-    ]
+    ],
+    pamm_mod: [
+      compose_unit_list,
+    ],
   }
 
   pamm.load = function() {
@@ -78,8 +91,8 @@ define([
     var server = new Context(enabled.server(), 'server', '/server_mods/')
     return Promise.all([
       pamm.save(),
-      client.write(),
-      server.write(),
+      client.write(pamm.extensions.pamm_mod),
+      server.write(pamm.extensions.pamm_mod),
     ]).then(function() {
       api.file.permazip.mounts(_.extend({}, client.mounts, server.mounts))
       console.timeEnd('pamm.write')
