@@ -38,7 +38,7 @@ define([
     })
   }
 
-  var refresh = function() {
+  var refresh = function(extensions) {
     console.time('scan')
     // prevent feedback on filesystem scans
     api.file.permazip.unmountAllMemoryFiles()
@@ -64,13 +64,13 @@ define([
     }
 
     return Promise.all([
-      new FilesystemScan().scan('/client_mods/')
+      new FilesystemScan(extensions).scan('/client_mods/')
         .then(register(['client'], 'client')),
-      new FilesystemScan().scan('/server_mods/')
+      new FilesystemScan(extensions).scan('/server_mods/')
         .then(register(['server'], 'server')),
-      new FilesystemScan().scan('/stockmods/server/')
+      new FilesystemScan(extensions).scan('/stockmods/server/')
         .then(register(['server'], 'stock/server')),
-      new DownloadScan().scan()
+      new DownloadScan(extensions).scan()
         .then(register(['client', 'server'], 'download')),
     ]).then(function() {
       state.mods = state.mods.filter(function(mod) {

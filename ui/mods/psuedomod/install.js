@@ -6,7 +6,7 @@ define([
 ], function(download, fix_paths, DownloadScan, Promise) {
   "use strict";
 
-  var install = function(mod) {
+  var install = function(mod, extensions) {
     if (!mod.url) {
       console.error(mod.identifier, 'has no url to install')
       return
@@ -25,7 +25,7 @@ define([
     }).then(function install_touchup(statusAndZip) {
       var status = statusAndZip[0]
       var zip = statusAndZip[1]
-      return new DownloadScan().examineZip(status.file, zip).then(function(scan) {
+      return new DownloadScan(extensions).examineZip(status.file, zip).then(function(scan) {
         if (scan.mods.length == 1) {
           _.assign(mod, scan.mods[0])
           mod.installed = true

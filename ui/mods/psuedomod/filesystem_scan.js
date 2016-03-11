@@ -1,11 +1,17 @@
 define([
   'pamm/filesystem_mod',
-  'pamm/infer_unit_list',
   'pamm/promise',
-], function(Mod, infer, Promise) {
+], function(Mod, Promise) {
   "use strict";
 
-  var Scan = function() {
+  var Scan = function(extensions) {
+    var my = this
+    this.steps = (extensions || []).slice(0)
+    this.steps.unshift(function(mod) {
+      return mod.modinfo().then(function(info) {
+        my.mods.push(info)
+      })
+    })
     this.mods = []
     this.enabled = []
     this.pending = 0
@@ -36,13 +42,9 @@ define([
 
       var mod = new Mod(path)
       my.pending++
-      mod.modinfo().then(function(info) {
-        my.mods.push(info)
-        infer(mod).always(function() {my.resolve()})
-      }, function(err) {
-        console.warn(path, 'had no modinfo')
-        my.resolve()
-      })
+      Promise.performAll(my.steps.map(function(step) {
+        return step(mod)
+      })).always(function() {my.resolve()})
     })
   }
 

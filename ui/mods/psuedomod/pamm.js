@@ -4,13 +4,14 @@ define([
   'pamm/mod_set',
   'pamm/context',
   'pamm/local_state',
+  'pamm/infer_unit_list',
   'pamm/promise',
-], function(available, install, ModSet, Context, local_state, Promise) {
+], function(available, install, ModSet, Context, local_state, infer_unit_list, Promise) {
   "use strict";
 
   ModSet.prototype.setInstall = function() {
     return Promise.all(this.map(function(mod) {
-      return install.install(mod).then(function setInstall_installed(status) {
+      return install.install(mod, pamm.extensions.scan).then(function setInstall_installed(status) {
         installed.push(mod);
       }, function setInstall_failed(status) {
         console.log('install failed', status)
@@ -32,6 +33,12 @@ define([
   pamm.installed = installed
   pamm.available = available
 
+  pamm.extensions = {
+    scan: [
+      infer_unit_list,
+    ]
+  }
+
   pamm.load = function() {
     console.time('pamm.load')
     return local_state.load().then(function(state) {
@@ -43,7 +50,7 @@ define([
 
   pamm.refresh = function() {
     console.time('pamm.refresh')
-    return local_state.refresh().then(function(state) {
+    return local_state.refresh(pamm.extensions.scan).then(function(state) {
       var enabled = installed.enabled().getIdentifiers()
       state.mods.forEach(function(mod) {
         if (!mod.enabled) {
@@ -121,6 +128,8 @@ define([
       })
     })
   }
+
+  pamm.Promise = Promise
 
   return pamm
 })

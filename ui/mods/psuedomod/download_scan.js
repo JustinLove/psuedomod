@@ -1,12 +1,18 @@
 define([
   'pamm/download_mod',
-  'pamm/infer_unit_list',
   'pamm/file',
   'pamm/promise',
-], function(Mod, infer, file, Promise) {
+], function(Mod, file, Promise) {
   "use strict";
 
-  var Scan = function() {
+  var Scan = function(extensions) {
+    var my = this
+    this.steps = (extensions || []).slice(0)
+    this.steps.unshift(function(mod) {
+      return mod.modinfo().then(function(info) {
+        my.mods.push(info)
+      })
+    })
     this.mods = []
     this.enabled = []
     this.pending = 0
@@ -41,18 +47,9 @@ define([
 
     var mod = new Mod(zip, filename)
     my.pending++
-    mod.modinfo().then(function(info) {
-      my.mods.push(info)
-      infer(mod).always(function() {my.resolve()})
-    }, function(err) {
-      //console.warn(filename, 'had no modinfo')
-      my.resolve()
-    })
-
-    // if we loaded it ourselves as part of a scan, should still be at least one pending
-    if (my.pending < 1) {
-      my.promise.reject()
-    }
+    Promise.performAll(my.steps.map(function(step) {
+      return step(mod)
+    })).always(function() {my.resolve()})
 
     return my.promise
   }
