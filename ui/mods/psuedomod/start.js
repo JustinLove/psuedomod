@@ -12,7 +12,9 @@
 console.timeEnd('mods-run')
 
 require([
-  'pamm/pamm'
+  'pamm/pamm',
+
+  'pamm/dev',
 ], function psuedomod_start(pamm) {
   "use strict";
 
