@@ -5,8 +5,6 @@ define([
   'pamm/context',
   'pamm/local_state',
   'pamm/lib/ba-issemver',
-  'pamm/infer_unit_list',
-  'pamm/compose_unit_list',
   'pamm/promise',
 ], function(
   available,
@@ -15,8 +13,6 @@ define([
   Context,
   local_state,
   isSemVer,
-  infer_unit_list,
-  compose_unit_list,
   Promise
 ) {
   "use strict";
@@ -58,12 +54,9 @@ define([
   pamm.available = available
 
   pamm.extensions = {
-    scan: [
-      infer_unit_list,
-    ],
-    pamm_mod: [
-      compose_unit_list,
-    ],
+    scan: [],
+    pamm_mod: [],
+    sources: available.sources,
   }
 
   pamm.load = function() {

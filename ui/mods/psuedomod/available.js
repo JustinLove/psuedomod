@@ -2,26 +2,21 @@ define([
   'pamm/mod_set',
   'pamm/download',
   'pamm/lib/ba-issemver',
-  'pamm/palobby',
-  'pamm/mereth',
   'pamm/promise',
-], function(ModSet, download, isSemVer, palobby, mereth, Promise) {
+], function(ModSet, download, isSemVer, Promise) {
   "use strict";
 
   var cache = 'available_mods.json'
 
-  var sources = [
-    palobby,
-    mereth,
-  ]
-
   var available = new ModSet()
 
-  var refreshAll = function() {
+  available.sources = []
+
+  var refreshAll = function(sources) {
     return Promise.performAll(sources.map(function(s) {return s.refresh()}))
   }
 
-  var loadAll = function() {
+  var loadAll = function(sources) {
     return Promise.performAll(sources.map(function(s) {return s.load()}))
   }
 
@@ -51,9 +46,10 @@ define([
     return best
   }
 
-  available.refresh = function() {
-    return refreshAll().then(function() {
-      return loadAll().then(mashup).then(function(mods) {
+  available.refresh = function(sources) {
+    sources = sources || available.sources
+    return refreshAll(sources).then(function() {
+      return loadAll(sources).then(mashup).then(function(mods) {
         return download.saveFile(JSON.stringify(mods, null, 2), cache)
       })
     })

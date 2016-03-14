@@ -13,10 +13,25 @@ console.timeEnd('mods-run')
 
 require([
   'pamm/pamm',
+  'pamm/palobby',
+  'pamm/mereth',
+  'pamm/infer_unit_list',
+  'pamm/compose_unit_list',
 
   'pamm/dev',
-], function psuedomod_start(pamm) {
+], function psuedomod_start(
+  pamm,
+  palobby,
+  mereth,
+  infer_unit_list,
+  compose_unit_list
+) {
   "use strict";
+
+  pamm.extensions.scan.push(infer_unit_list)
+  pamm.extensions.pamm_mod.push(compose_unit_list)
+  pamm.extensions.sources.push(palobby)
+  pamm.extensions.sources.push(mereth)
 
   api.pamm = pamm
   console.timeEnd('page-displayed')
