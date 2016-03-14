@@ -37,6 +37,15 @@ define(['pamm/promise'], function(Promise) {
     return fileStatus[filename].promise
   }
 
+  var saveFile = function(text, filename) {
+    var blob = new Blob([text], {type : 'application/json'});
+    var url = window.URL.createObjectURL(blob)
+    return save(url, filename).always(function(status) {
+      window.URL.revokeObjectURL(url)
+      return status
+    })
+  }
+
   var onDownload = api.download.onDownload
   api.download.onDownload = function(status) {
     onDownload(status)
@@ -100,5 +109,6 @@ define(['pamm/promise'], function(Promise) {
   return {
     fetch: fetch,
     save: save,
+    saveFile: saveFile,
   }
 })
