@@ -4,6 +4,7 @@ define([
   'pamm/mod_set',
   'pamm/context',
   'pamm/local_state',
+  'pamm/lib/ba-issemver',
   'pamm/infer_unit_list',
   'pamm/compose_unit_list',
   'pamm/promise',
@@ -13,6 +14,7 @@ define([
   ModSet,
   Context,
   local_state,
+  isSemVer,
   infer_unit_list,
   compose_unit_list,
   Promise
@@ -35,6 +37,18 @@ define([
         installed.remove(mod)
       })
     }))
+  }
+
+  ModSet.prototype.outdated = function() {
+    return installed.find(this.getIdentifiers()).filter(function(mod) {
+      var a = available.find(mod.identifier)
+      for (var i = 0;i < a.length;i++) {
+        if (isSemVer(mod.version, '<'+a[i].version)) {
+          //console.log(mod.identifier, mod.version, a[i].version)
+          return true
+        }
+      }
+    })
   }
 
   var installed = new ModSet()
