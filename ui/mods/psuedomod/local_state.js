@@ -28,7 +28,7 @@ define([
       } else {
         return refresh().then(function(state) {
           save(state)
-          Promise.wrap(api.file.permazip.mount('refresh restore'))
+          return Promise.wrap(api.file.permazip.mount('refresh restore'))
             .then(function() { return state })
         })
       }
