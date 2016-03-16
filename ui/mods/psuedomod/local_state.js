@@ -87,6 +87,8 @@ define([
     })
   }
 
+  var topLevelScenes = ["global_mod_list", "armory", "building_planets", "connect_to_game", "game_over", "icon_atlas", "live_game", "live_game_econ", "live_game_hover", "load_planet", "lobby", "matchmaking", "new_game", "replay_browser", "server_browser", "settings", "social", "special_icon_atlas", "start", "system_editor", "transit"] // deprecated
+
   var normalizeMod = function(mod) {
     mod.installed = true
     mod.fileSystem = !!mod.installedPath
@@ -115,6 +117,15 @@ define([
       mod.date = 'Unknown';
       mod.timestamp = 0;
     }
+
+    topLevelScenes.forEach(function(scene) {
+      if (mod[scene]) {
+        console.warn(mod.identifier, 'top level scene', scene)
+        mod.scenes = mod.scenes || {}
+        mod.scenes[scene] = mod[scene]
+        delete mod[scene]
+      }
+    })
   }
 
   var zeroPad = function(n) {
