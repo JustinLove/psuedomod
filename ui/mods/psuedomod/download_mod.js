@@ -22,11 +22,21 @@ define(['pamm/download_object', 'pamm/promise'], function(File, Promise) {
     }
   }
 
+  var topLevelScenes = ["global_mod_list", "armory", "building_planets", "connect_to_game", "game_over", "icon_atlas", "live_game", "live_game_econ", "live_game_hover", "load_planet", "lobby", "matchmaking", "new_game", "replay_browser", "server_browser", "settings", "social", "special_icon_atlas", "start", "system_editor", "transit"] // deprecated
+
   var addModinfo = function(path, file) {
     //console.log('addmodinfo', path, file)
     try {
       var info = JSON.parse(file.asText())
       info.zipPath = path
+      topLevelScenes.forEach(function(scene) {
+        if (info[scene]) {
+          console.warn(info.identifier, 'top level scene', scene)
+          info.scenes = info.scenes || {}
+          info.scenes[scene] = info[scene]
+          delete info[scene]
+        }
+      })
       if (info.scenes) {
         _.each(info.scenes, function(value, key) {
           info.scenes[key] = value.map(function(filename) {
