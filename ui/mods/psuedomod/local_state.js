@@ -11,6 +11,7 @@ define([
     'com.pa.deathbydenim.dpamm',
     'com.pa.raevn.rpamm',
     'com.pa.pamm.server',
+    'community-mods-server',
   ]
 
   var key = 'com.wondible.pa.pamm.mods'
