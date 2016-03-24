@@ -44,7 +44,7 @@
 
   api.file.unmountAllMemoryFiles = function permazip_unmountAllMemoryFiles() {
     pz.unmountAllMemoryFiles()
-    pz.mount('unmounted')
+    return pz.mount('unmounted')
   }
 
   api.game.getSetupInfo().then(function (payload) {
