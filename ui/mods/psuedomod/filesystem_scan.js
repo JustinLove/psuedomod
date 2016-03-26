@@ -9,7 +9,7 @@ define([
     this.steps = (extensions || []).slice(0)
     this.steps.unshift(function(mod) {
       return mod.modinfo().then(function(info) {
-        my.mods.push(info)
+        if (info) my.mods.push(info)
       })
     })
     this.mods = []

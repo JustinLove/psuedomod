@@ -34,7 +34,7 @@
 					return;
 				} else {
 					args = [retVal];
-					method = 'resolve';
+					//method = 'resolve';
 				}
 			}
 
